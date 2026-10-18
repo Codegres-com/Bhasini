@@ -1,0 +1,566 @@
+@page "/"
+@inject TypingSession Session
+@inject IJSRuntime JS
+@implements IDisposable
+
+<PageTitle>Bhasini — @Language.Name typing</PageTitle>
+
+<div id="main-toolbar" class="toolbar">
+    <div class="toolbar-group">
+        <button class="btn btn-lang" @onclick="OpenLanguagePicker" title="Choose language">
+            <span class="lang-native @Language.FontClass">@Language.NativeName</span>
+            <span class="lang-name">@Language.Name</span>
+            <span class="bi bi-chevron-down"></span>
+        </button>
+    </div>
+
+    <div class="toolbar-group">
+        <div class="btn-group method-switch" role="group" aria-label="Input method">
+            <button class="btn @(Session.Method == InputMethod.Phonetic && !Language.IsEnglish ? "btn-primary" : "btn-outline-primary")"
+                    disabled="@Language.IsEnglish" @onclick="() => SetMethod(InputMethod.Phonetic)"
+                    title="Type how it sounds: namaste → @Language.Sample">Phonetic</button>
+            <button class="btn @(Session.Method == InputMethod.Inscript ? "btn-primary" : "btn-outline-primary")"
+                    disabled="@(!Language.SupportsInscript)" @onclick="() => SetMethod(InputMethod.Inscript)"
+                    title="@(Language.SupportsInscript ? "Government-standard InScript keyboard" : "InScript is not defined for this script")">InScript</button>
+            <button class="btn @(!Session.IsActive ? "btn-dark" : "btn-outline-dark")"
+                    @onclick="() => SetMethod(InputMethod.English)" title="Type plain English (F9 toggles)">ABC</button>
+        </div>
+        @if (Language.DigitMapper != null)
+        {
+            <div class="form-check form-switch m-0" title="Type digits in the native script">
+                <input class="form-check-input" type="checkbox" id="nativeDigits" checked="@Session.NativeDigits" @onchange="ToggleDigits">
+                <label class="form-check-label small" for="nativeDigits">@NativeDigitSample digits</label>
+            </div>
+        }
+    </div>
+
+    <div class="toolbar-group">
+        <div class="btn-group" role="group">
+            <button class="btn btn-outline-secondary" @onclick='() => Editor("undo")' title="Undo"><span class="bi bi-arrow-counterclockwise"></span></button>
+            <button class="btn btn-outline-secondary" @onclick='() => Editor("redo")' title="Redo"><span class="bi bi-arrow-clockwise"></span></button>
+            <button id="btn-copy" class="btn btn-outline-secondary" title="Copy"><span class="bi bi-clipboard"></span></button>
+        </div>
+        <button class="btn @(showKeymap ? "btn-secondary" : "btn-outline-secondary")" @onclick="ToggleKeymap" title="Show the keys for this language">
+            <span class="bi bi-keyboard"></span> Keys
+        </button>
+        <button class="btn btn-outline-secondary" @onclick="OpenConvert" title="Convert text between Indian scripts">
+            <span class="bi bi-arrow-left-right"></span> Convert
+        </button>
+        @if (speechSupported && Language.SpeechLocale != null)
+        {
+            <button class="btn @(listening ? "btn-danger" : "btn-outline-secondary")" @onclick="ToggleSpeech" title="Dictate in @Language.Name">
+                <span class="bi @(listening ? "bi-mic-fill" : "bi-mic")"></span> @(listening ? "Stop" : "Speak")
+            </button>
+        }
+    </div>
+
+    <div class="toolbar-group ms-auto">
+        <InputFile OnChange="LoadDocument" class="d-none" id="fileUpload" accept=".txt,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+        <label for="fileUpload" class="btn btn-outline-secondary mb-0"><span class="bi bi-folder2-open"></span> Open</label>
+        <button class="btn btn-success" @onclick="() => showSave = true"><span class="bi bi-download"></span> Save</button>
+    </div>
+</div>
+
+<div class="status-bar">
+    @if (Session.IsActive)
+    {
+        <span class="status-dot on"></span>
+        <span>Typing <strong>@Language.Name</strong> in @Language.ScriptName (@MethodLabel)</span>
+        @if (Session.Method == InputMethod.Phonetic && Language.SampleInput.Length > 0)
+        {
+            <span class="status-hint">Try: <code>@Language.SampleInput</code> → <span class="@Language.FontClass">@Language.Sample</span></span>
+        }
+    }
+    else
+    {
+        <span class="status-dot"></span>
+        <span>Typing plain English</span>
+    }
+    <span class="status-hint ms-auto">F9 switches @Language.Name ⇄ English</span>
+    @if (statusMessage != null)
+    {
+        <span class="status-message">@statusMessage</span>
+    }
+</div>
+
+<div class="workspace">
+    <div id="editor-wrapper" class="editor-wrapper">
+        <div id="quill-editor"></div>
+    </div>
+
+    @if (showKeymap)
+    {
+        <aside class="keymap-panel">
+            <div class="keymap-header">
+                <div>
+                    <div class="fw-semibold">@Language.Name keys</div>
+                    <div class="small text-muted">@(Session.Method == InputMethod.Inscript ? "InScript layout" : "Phonetic") · tap a letter to insert it</div>
+                </div>
+                <button class="btn-close" @onclick="ToggleKeymap" aria-label="Close"></button>
+            </div>
+            <div class="keymap-body">
+                @if (Language.IsEnglish)
+                {
+                    <p class="text-muted small">English needs no key map. Pick an Indian language to see its keys.</p>
+                }
+                else if (Session.Method == InputMethod.Inscript)
+                {
+                    @foreach (var (row, shiftRow) in InscriptLayout.Rows.Zip(InscriptLayout.ShiftRows))
+                    {
+                        <div class="inscript-row">
+                            @for (int i = 0; i < row.Length; i++)
+                            {
+                                var key = row[i];
+                                var shiftKey = shiftRow[i];
+                                var lower = InscriptOutput(key);
+                                var upper = InscriptOutput(shiftKey);
+                                <div class="inscript-key">
+                                    <span class="ik-upper @Language.FontClass" @onclick="() => InsertGlyph(upper)">@upper</span>
+                                    <span class="ik-lower @Language.FontClass" @onclick="() => InsertGlyph(lower)">@lower</span>
+                                    <span class="ik-label">@key</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    @foreach (var group in Language.Phonetic!.Keymap)
+                    {
+                        <div class="keymap-group-title">@group.Title</div>
+                        <div class="keymap-grid">
+                            @foreach (var entry in group.Entries)
+                            {
+                                <button class="keymap-cell" @onclick="() => InsertGlyph(entry.Output)" title="Insert @entry.Output">
+                                    <span class="km-out @Language.FontClass" dir="auto">@entry.Output</span>
+                                    @if (entry.Note != null)
+                                    {
+                                        <span class="km-note @Language.FontClass" dir="auto">@entry.Note</span>
+                                    }
+                                    <span class="km-keys">@entry.Keys</span>
+                                </button>
+                            }
+                        </div>
+                    }
+                    @if (Language.Phonetic is BrahmicPhoneticEngine)
+                    {
+                        <div class="keymap-note small text-muted">
+                            Consonants join automatically: <code>kSh</code>, <code>str</code>, <code>ndr</code>.
+                            Use <code>_</code> to keep letters apart, <code>.h</code> for an explicit virama,
+                            and <code>|</code> / <code>||</code> for danda.
+                        </div>
+                    }
+                }
+            </div>
+        </aside>
+    }
+</div>
+
+@if (showLanguagePicker)
+{
+    <div class="modal-backdrop show"></div>
+    <div class="modal show d-block" tabindex="-1" @onclick="CloseModals">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" @onclick:stopPropagation>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title">Choose a language</h5>
+                        <div class="small text-muted">The 22 languages in the Eighth Schedule of the Constitution of India, plus English</div>
+                    </div>
+                    <button type="button" class="btn-close" @onclick="CloseModals"></button>
+                </div>
+                <div class="modal-body">
+                    <input class="form-control mb-3" placeholder="Search languages or scripts…" @bind="languageFilter" @bind:event="oninput" />
+                    <div class="language-grid">
+                        @foreach (var lang in FilteredLanguages)
+                        {
+                            <button class="language-tile @(lang == Language ? "active" : "")" @onclick="() => ChooseLanguage(lang)">
+                                <span class="lt-native @lang.FontClass" dir="auto">@lang.NativeName</span>
+                                <span class="lt-name">@lang.Name</span>
+                                <span class="lt-meta">@lang.ScriptName@(lang.ScheduledSince != null ? $" · since {lang.ScheduledSince}" : "")</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showSave)
+{
+    <div class="modal-backdrop show"></div>
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Save document</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModals"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="filenameInput" class="form-label">File name</label>
+                    <input type="text" class="form-control mb-3" id="filenameInput" @bind="saveFileName">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" @onclick="DownloadDocx"><span class="bi bi-file-earmark-word"></span> Word document (.docx)</button>
+                        <button class="btn btn-outline-primary" @onclick="DownloadTxt"><span class="bi bi-file-earmark-text"></span> Plain text (.txt)</button>
+                        <button class="btn btn-outline-primary" @onclick="DownloadHtml"><span class="bi bi-filetype-html"></span> Web page (.html)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showConvert)
+{
+    <div class="modal-backdrop show"></div>
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="bi bi-arrow-left-right me-2"></span>Convert text</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModals"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label small text-muted">Convert</label>
+                    <select class="form-select mb-3" @bind="convertMode">
+                        <option value="script">Indian script → another Indian script</option>
+                        <option value="roman">Romanised text (e.g. "namaste") → native script</option>
+                    </select>
+
+                    <label class="form-label small text-muted">Into</label>
+                    <select class="form-select mb-3" @bind="convertTarget">
+                        @foreach (var lang in ConvertTargets)
+                        {
+                            <option value="@lang.Code">@lang.Name — @lang.NativeName (@lang.ScriptName)</option>
+                        }
+                    </select>
+
+                    <div class="small text-muted">
+                        @(convertHasSelection ? "The selected text will be converted." : "Nothing is selected, so the whole document will be converted.")
+                        @if (convertMode == "script")
+                        {
+                            <br /><span>Script conversion works letter by letter between Brahmic scripts and Meetei Mayek; sounds a script lacks use the nearest letter.</span>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModals">Cancel</button>
+                    <button class="btn btn-primary" @onclick="RunConvert">Convert</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    IndicLanguage Language => Session.Language;
+
+    bool showKeymap;
+    bool showLanguagePicker;
+    bool showSave;
+    bool showConvert;
+    bool speechSupported;
+    bool listening;
+    string languageFilter = "";
+    string saveFileName = "Bhasini";
+    string convertMode = "script";
+    string convertTarget = "hi";
+    bool convertHasSelection;
+    string? statusMessage;
+    InputMethod lastIndicMethod = InputMethod.Phonetic;
+    DotNetObjectReference<Home>? selfRef;
+
+    string MethodLabel => Session.Method == InputMethod.Inscript ? "InScript" : "Phonetic";
+
+    string NativeDigitSample => string.Concat(Enumerable.Range(1, 3).Select(d => Language.NativeDigit(d)?.ToString() ?? ""));
+
+    IEnumerable<IndicLanguage> FilteredLanguages => LanguageCatalog.All.Where(l =>
+        languageFilter.Length == 0 ||
+        l.Name.Contains(languageFilter, StringComparison.OrdinalIgnoreCase) ||
+        l.ScriptName.Contains(languageFilter, StringComparison.OrdinalIgnoreCase) ||
+        l.NativeName.Contains(languageFilter) ||
+        l.Code.StartsWith(languageFilter, StringComparison.OrdinalIgnoreCase));
+
+    IEnumerable<IndicLanguage> ConvertTargets => convertMode == "roman"
+        ? LanguageCatalog.All.Where(l => !l.IsEnglish)
+        : LanguageCatalog.All.Where(ScriptConverter.CanConvertTo);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        selfRef = DotNetObjectReference.Create(this);
+        var settings = await JS.InvokeAsync<SavedSettings?>("bhasini.storage.load");
+        if (settings != null)
+        {
+            Session.SetLanguage(LanguageCatalog.Get(settings.Language));
+            if (Enum.TryParse<InputMethod>(settings.Method, out var method)) Session.SetMethod(method);
+            Session.NativeDigits = settings.NativeDigits;
+            showKeymap = settings.ShowKeymap;
+        }
+        if (Session.Method != InputMethod.English) lastIndicMethod = Session.Method;
+
+        await JS.InvokeVoidAsync("bhasini.editor.init", "#quill-editor", selfRef);
+        await ApplyEditorLanguage();
+        speechSupported = await JS.InvokeAsync<bool>("bhasini.speech.isSupported");
+        StateHasChanged();
+    }
+
+    // ---- Called synchronously by the editor for every key ----
+
+    [JSInvokable]
+    public KeyResult? OnKey(string key) => key.Length == 1 ? Session.Key(key[0]) : null;
+
+    [JSInvokable]
+    public KeyResult? OnBackspace() => Session.Backspace();
+
+    [JSInvokable]
+    public void OnReset() => Session.Reset();
+
+    [JSInvokable]
+    public async Task OnToggleInput()
+    {
+        await SetMethod(Session.IsActive ? InputMethod.English : lastIndicMethod);
+        StateHasChanged();
+    }
+
+    // ---- Language and method ----
+
+    private void OpenLanguagePicker()
+    {
+        languageFilter = "";
+        showLanguagePicker = true;
+    }
+
+    private async Task ChooseLanguage(IndicLanguage lang)
+    {
+        Session.SetLanguage(lang);
+        // Picking a language means wanting to type it.
+        if (!lang.IsEnglish && Session.Method == InputMethod.English) Session.SetMethod(lastIndicMethod);
+        showLanguagePicker = false;
+        if (listening) await JS.InvokeVoidAsync("bhasini.speech.stop");
+        await ApplyEditorLanguage();
+        await SaveSettings();
+        await JS.InvokeVoidAsync("bhasini.editor.focus");
+    }
+
+    private async Task SetMethod(InputMethod method)
+    {
+        Session.SetMethod(method);
+        if (Session.Method != InputMethod.English) lastIndicMethod = Session.Method;
+        await JS.InvokeVoidAsync("bhasini.editor.setActive", Session.IsActive);
+        await SaveSettings();
+        await JS.InvokeVoidAsync("bhasini.editor.focus");
+    }
+
+    private async Task ToggleDigits(ChangeEventArgs e)
+    {
+        Session.NativeDigits = e.Value is bool b && b;
+        await SaveSettings();
+    }
+
+    private async Task ToggleKeymap()
+    {
+        showKeymap = !showKeymap;
+        await SaveSettings();
+    }
+
+    private async Task ApplyEditorLanguage()
+    {
+        await JS.InvokeVoidAsync("bhasini.editor.setLanguage", new
+        {
+            code = Language.Code,
+            fontClass = Language.FontClass,
+            rtl = Language.RightToLeft,
+            active = Session.IsActive,
+        });
+    }
+
+    private async Task SaveSettings()
+    {
+        await JS.InvokeVoidAsync("bhasini.storage.save", new SavedSettings
+        {
+            Language = Language.Code,
+            Method = Session.Method.ToString(),
+            NativeDigits = Session.NativeDigits,
+            ShowKeymap = showKeymap,
+        });
+    }
+
+    public sealed class SavedSettings
+    {
+        public string? Language { get; set; }
+        public string? Method { get; set; }
+        public bool NativeDigits { get; set; }
+        public bool ShowKeymap { get; set; }
+    }
+
+    // ---- Keymap palette ----
+
+    private string InscriptOutput(char key)
+    {
+        var deva = InscriptLayout.Map(key);
+        return deva == null || Language.Mapper == null ? "" : Language.Mapper.FromDevanagari(deva, phonetic: false);
+    }
+
+    private async Task InsertGlyph(string text)
+    {
+        if (string.IsNullOrEmpty(text) || text.StartsWith("(")) return;
+        var glyph = text.Replace("◌", "");
+        Session.Reset();
+        await JS.InvokeVoidAsync("bhasini.editor.insertText", glyph);
+    }
+
+    // ---- Editor commands ----
+
+    private async Task Editor(string command) => await JS.InvokeVoidAsync("bhasini.editor." + command);
+
+    private void CloseModals()
+    {
+        showLanguagePicker = false;
+        showSave = false;
+        showConvert = false;
+    }
+
+    private async Task DownloadDocx()
+    {
+        var html = await JS.InvokeAsync<string>("bhasini.editor.getHtml");
+        await JS.InvokeVoidAsync("bhasini.files.saveDocx", FileName(".docx"), html);
+        CloseModals();
+    }
+
+    private async Task DownloadTxt()
+    {
+        var text = await JS.InvokeAsync<string>("bhasini.editor.getText");
+        await JS.InvokeVoidAsync("bhasini.files.download", FileName(".txt"), text, "text/plain;charset=utf-8");
+        CloseModals();
+    }
+
+    private async Task DownloadHtml()
+    {
+        var html = await JS.InvokeAsync<string>("bhasini.editor.getHtml");
+        var page = $"<!DOCTYPE html><html lang=\"{Language.Code}\"><head><meta charset=\"utf-8\"><title>{System.Net.WebUtility.HtmlEncode(saveFileName)}</title></head><body dir=\"{(Language.RightToLeft ? "rtl" : "ltr")}\">{html}</body></html>";
+        await JS.InvokeVoidAsync("bhasini.files.download", FileName(".html"), page, "text/html;charset=utf-8");
+        CloseModals();
+    }
+
+    private string FileName(string extension) => (string.IsNullOrWhiteSpace(saveFileName) ? "Bhasini" : saveFileName.Trim()) + extension;
+
+    private async Task LoadDocument(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+            await using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var bytes = ms.ToArray();
+
+            string html;
+            if (ext == ".docx")
+            {
+                html = await JS.InvokeAsync<string>("bhasini.files.docxToHtml", bytes);
+            }
+            else
+            {
+                var text = System.Text.Encoding.UTF8.GetString(bytes);
+                html = string.Join("", text.Replace("\r\n", "\n").Split('\n')
+                    .Select(line => "<p>" + (line.Length == 0 ? "<br>" : System.Net.WebUtility.HtmlEncode(line)) + "</p>"));
+            }
+
+            Session.Reset();
+            await JS.InvokeVoidAsync("bhasini.editor.setHtml", html);
+            saveFileName = Path.GetFileNameWithoutExtension(file.Name);
+            ShowStatus($"Opened {file.Name}");
+        }
+        catch (Exception ex)
+        {
+            ShowStatus("Could not open the file: " + ex.Message);
+        }
+    }
+
+    // ---- Script conversion ----
+
+    private async Task OpenConvert()
+    {
+        var selected = await JS.InvokeAsync<string>("bhasini.editor.getSelectedText");
+        convertHasSelection = !string.IsNullOrEmpty(selected);
+        convertTarget = ConvertTargets.Contains(Language) ? Language.Code : "hi";
+        showConvert = true;
+    }
+
+    private async Task RunConvert()
+    {
+        var target = LanguageCatalog.Get(convertTarget);
+        var selected = await JS.InvokeAsync<string>("bhasini.editor.getSelectedText");
+        bool whole = string.IsNullOrEmpty(selected);
+        var source = whole ? await JS.InvokeAsync<string>("bhasini.editor.getText") : selected;
+
+        var converted = convertMode == "roman"
+            ? ScriptConverter.FromRoman(source, target)
+            : ScriptConverter.ConvertScript(source, target);
+
+        Session.Reset();
+        if (whole) await JS.InvokeVoidAsync("bhasini.editor.setText", converted);
+        else await JS.InvokeVoidAsync("bhasini.editor.replaceSelection", converted);
+
+        CloseModals();
+        ShowStatus($"Converted to {target.Name}");
+    }
+
+    // ---- Speech ----
+
+    private async Task ToggleSpeech()
+    {
+        if (listening)
+        {
+            await JS.InvokeVoidAsync("bhasini.speech.stop");
+        }
+        else if (Language.SpeechLocale != null)
+        {
+            await JS.InvokeVoidAsync("bhasini.speech.start", Language.SpeechLocale, selfRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnSpeechResult(string text)
+    {
+        Session.Reset();
+        await JS.InvokeVoidAsync("bhasini.editor.insertText", text + " ");
+    }
+
+    [JSInvokable]
+    public void OnSpeechState(bool isListening, string? error)
+    {
+        listening = isListening;
+        if (!string.IsNullOrEmpty(error)) ShowStatus(error == "language-not-supported"
+            ? $"This browser cannot recognise {Language.Name} speech."
+            : "Speech: " + error);
+        StateHasChanged();
+    }
+
+    private CancellationTokenSource? statusCts;
+
+    private async void ShowStatus(string message)
+    {
+        statusMessage = message;
+        statusCts?.Cancel();
+        var cts = statusCts = new CancellationTokenSource();
+        StateHasChanged();
+        try
+        {
+            await Task.Delay(4000, cts.Token);
+            statusMessage = null;
+            StateHasChanged();
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    public void Dispose()
+    {
+        statusCts?.Cancel();
+        selfRef?.Dispose();
+    }
+}

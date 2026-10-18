@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bhasini-web",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/Bhasini.Web", "--urls", "http://localhost:35636"],
+      "port": 35636
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+bin/
+obj/
+publish/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+TestResults/
+*.log
+node_modules/
+.DS_Store
+Thumbs.db

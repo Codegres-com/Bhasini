@@ -1,0 +1,384 @@
+@font-face { font-family: 'Poppins'; src: url('../fonts/Poppins-Regular.ttf') format('truetype'); font-weight: 400; }
+@font-face { font-family: 'Poppins'; src: url('../fonts/Poppins-Medium.ttf') format('truetype'); font-weight: 500; }
+@font-face { font-family: 'Poppins'; src: url('../fonts/Poppins-SemiBold.ttf') format('truetype'); font-weight: 600; }
+@font-face { font-family: 'Poppins'; src: url('../fonts/Poppins-Bold.ttf') format('truetype'); font-weight: 700; }
+
+:root {
+    --ink: #1f2a5c;
+    --ink-soft: #4a5488;
+    --saffron: #f07b2b;
+    --surface: #ffffff;
+    --canvas: #f4f1ea;
+    --line: #e3ded2;
+    --muted: #6b6f80;
+    --bs-primary: #2d3a8c;
+    --bs-primary-rgb: 45, 58, 140;
+    --deva: 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Poppins', 'Nirmala UI', system-ui, sans-serif;
+    background: var(--canvas);
+    color: #222;
+    overflow: hidden;
+}
+
+/* Script fonts: web fonts first, then the system fonts that cover each script offline. */
+.script-latn { font-family: 'Poppins', system-ui, sans-serif; }
+.script-deva { font-family: var(--deva); }
+.script-beng { font-family: 'Noto Sans Bengali', 'Nirmala UI', 'Vrinda', 'Shonar Bangla', sans-serif; }
+.script-guru { font-family: 'Noto Sans Gurmukhi', 'Nirmala UI', 'Raavi', sans-serif; }
+.script-gujr { font-family: 'Noto Sans Gujarati', 'Nirmala UI', 'Shruti', sans-serif; }
+.script-orya { font-family: 'Noto Sans Oriya', 'Nirmala UI', 'Kalinga', sans-serif; }
+.script-taml { font-family: 'Noto Sans Tamil', 'Nirmala UI', 'Latha', sans-serif; }
+.script-telu { font-family: 'Noto Sans Telugu', 'Nirmala UI', 'Gautami', sans-serif; }
+.script-knda { font-family: 'Noto Sans Kannada', 'Nirmala UI', 'Tunga', sans-serif; }
+.script-mlym { font-family: 'Noto Sans Malayalam', 'Nirmala UI', 'Kartika', sans-serif; }
+.script-mtei { font-family: 'Noto Sans Meetei Mayek', 'Nirmala UI', sans-serif; }
+.script-olck { font-family: 'Noto Sans Ol Chiki', 'Nirmala UI', sans-serif; }
+.script-arab-nastaliq { font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Noto Naskh Arabic', serif; }
+.script-arab-naskh { font-family: 'Noto Naskh Arabic', 'Segoe UI', 'Arial', serif; }
+
+/* ---------- Layout ---------- */
+
+.page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 20px;
+    background: linear-gradient(100deg, var(--ink) 0%, #2d3a8c 70%, #3b2f7a 100%);
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.app-logo { width: 44px; height: 44px; }
+
+.app-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.app-title-native {
+    font-family: var(--deva);
+    font-weight: 600;
+    color: #ffc58f;
+    margin-left: 6px;
+}
+
+.app-tagline { font-size: .8rem; opacity: .8; }
+
+.app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 12px 16px 0;
+    gap: 8px;
+}
+
+.app-footer {
+    flex-shrink: 0;
+    text-align: center;
+    font-size: .75rem;
+    color: var(--muted);
+    padding: 6px 12px;
+}
+
+.app-footer a { color: var(--ink-soft); }
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.toolbar .btn { font-size: .875rem; }
+
+.btn-lang {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid var(--saffron);
+    background: #fff7f0;
+    border-radius: 10px;
+    padding: 4px 12px;
+}
+
+.btn-lang:hover { background: #ffeddc; border-color: var(--saffron); }
+
+.lang-native { font-size: 1.15rem; font-weight: 600; color: var(--ink); }
+.lang-name { font-size: .85rem; color: var(--muted); }
+
+.btn-primary { background-color: var(--bs-primary); border-color: var(--bs-primary); }
+.btn-outline-primary { color: var(--bs-primary); border-color: var(--bs-primary); }
+.btn-outline-primary:hover, .btn-outline-primary:disabled:hover { background-color: var(--bs-primary); }
+.btn-outline-primary:disabled { color: #9aa0c3; border-color: #c9cce2; }
+
+/* ---------- Status bar ---------- */
+
+.status-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    font-size: .8rem;
+    color: var(--muted);
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b9b9b9;
+}
+
+.status-dot.on { background: #2fb36b; box-shadow: 0 0 0 3px rgba(47, 179, 107, .18); }
+
+.status-hint code { background: #ece8de; color: var(--ink); padding: 1px 5px; border-radius: 4px; }
+.status-hint span { color: var(--ink); font-size: 1rem; }
+
+.status-message {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 999px;
+    padding: 2px 10px;
+}
+
+/* ---------- Workspace ---------- */
+
+.workspace {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    min-height: 0;
+}
+
+.editor-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#quill-editor { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+.ql-toolbar.ql-snow { border: 0; border-bottom: 1px solid var(--line); background: #fbfaf7; }
+.ql-container.ql-snow { border: 0; flex: 1; min-height: 0; font-size: inherit; }
+
+.ql-editor {
+    height: 100%;
+    overflow-y: auto;
+    font-size: 1.6rem;
+    line-height: 1.7;
+    padding: 20px 28px;
+    text-rendering: optimizeLegibility;
+}
+
+.ql-editor.script-arab-nastaliq { line-height: 2.4; }
+.ql-editor.rtl { text-align: right; }
+.ql-editor.ql-blank::before { font-style: normal; color: #b0b0b8; left: 28px; right: 28px; }
+.ql-editor.rtl.ql-blank::before { text-align: right; }
+
+/* ---------- Keymap panel ---------- */
+
+.keymap-panel {
+    width: 360px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.keymap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    background: #fbfaf7;
+}
+
+.keymap-body { overflow-y: auto; padding: 10px 14px 16px; }
+
+.keymap-group-title {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin: 12px 0 6px;
+    font-weight: 600;
+}
+
+.keymap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 6px;
+}
+
+.keymap-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 4px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.keymap-cell:hover { border-color: var(--saffron); background: #fff7f0; }
+
+.km-out { font-size: 1.35rem; line-height: 1.3; color: var(--ink); min-height: 1.7rem; }
+.km-note { font-size: .75rem; color: var(--muted); line-height: 1.4; }
+.km-keys { font-size: .7rem; color: var(--muted); font-family: ui-monospace, Consolas, monospace; text-align: center; word-break: break-word; }
+
+.keymap-note { margin-top: 14px; line-height: 1.5; }
+.keymap-note code { background: #ece8de; color: var(--ink); padding: 0 4px; border-radius: 3px; }
+
+.inscript-row { display: flex; gap: 3px; margin-bottom: 3px; }
+.inscript-row:nth-child(2) { padding-left: 10px; }
+.inscript-row:nth-child(3) { padding-left: 18px; }
+.inscript-row:nth-child(4) { padding-left: 28px; }
+
+.inscript-key {
+    position: relative;
+    width: 24px;
+    height: 46px;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: .95rem;
+    line-height: 1.15;
+}
+
+.inscript-key span { cursor: pointer; }
+.ik-upper { color: var(--ink-soft); font-size: .8rem; }
+.ik-lower { color: var(--ink); }
+.ik-label { position: absolute; bottom: 1px; right: 2px; font-size: .5rem; color: #aaa; cursor: default; }
+
+/* ---------- Language picker ---------- */
+
+.language-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+}
+
+.language-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    text-align: left;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+
+.language-tile:hover { border-color: var(--saffron); box-shadow: 0 6px 16px rgba(31, 42, 92, .08); transform: translateY(-1px); }
+.language-tile.active { border: 2px solid var(--saffron); background: #fff7f0; }
+
+.lt-native { font-size: 1.4rem; line-height: 1.6; color: var(--ink); width: 100%; }
+.lt-name { font-weight: 600; font-size: .9rem; }
+.lt-meta { font-size: .72rem; color: var(--muted); }
+
+.modal-backdrop.show { opacity: .45; }
+
+/* ---------- Boot screen ---------- */
+
+.boot {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--canvas);
+}
+
+.boot-logo { width: 72px; height: 72px; }
+.boot-title { font-size: 1.6rem; font-weight: 700; color: var(--ink); }
+.boot-scripts { font-size: 1.3rem; letter-spacing: .3em; color: var(--ink-soft); font-family: 'Nirmala UI', sans-serif; }
+
+.boot-progress { width: 180px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.boot-progress div {
+    height: 100%;
+    width: var(--blazor-load-percentage, 10%);
+    background: var(--saffron);
+    transition: width .1s;
+}
+
+#blazor-error-ui {
+    background: #fff3cd;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, .2);
+    display: none;
+    left: 0;
+    padding: .6rem 1.25rem .7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: .75rem; top: .5rem; }
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 900px) {
+    .keymap-panel { position: fixed; right: 0; top: 0; bottom: 0; width: min(360px, 92vw); z-index: 1040; border-radius: 0; box-shadow: -8px 0 24px rgba(0, 0, 0, .15); }
+}
+
+@media (max-width: 640px) {
+    .app-header { padding: 8px 14px; }
+    .app-tagline { display: none; }
+    .app-main { padding: 8px 8px 0; }
+    .toolbar { padding: 8px; gap: 8px; }
+    .toolbar-group.ms-auto { margin-left: 0 !important; }
+    .status-hint.ms-auto { display: none; }
+    .ql-editor { font-size: 1.3rem; padding: 14px 16px; }
+    .app-footer { display: none; }
+}

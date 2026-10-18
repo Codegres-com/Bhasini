@@ -1,5 +1,8 @@
 # Bhasini (भाषिणी)
 
+[![Sponsor via Razorpay](https://img.shields.io/badge/Sponsor-Razorpay-0C2451?style=for-the-badge&logo=razorpay&logoColor=white)](https://razorpay.me/@codegres)
+[![Open Bhasini](https://img.shields.io/badge/Open-bhasini.com-f07b2b?style=for-the-badge)](https://bhasini.com)
+
 A multilingual Indic typing editor for all **22 scheduled languages of India**, built with
 Blazor WebAssembly. Everything runs in the browser; no server round-trips while you type.
 
@@ -85,3 +88,9 @@ docker build -t bhasini .
 
 Script fonts come from Google Fonts (Noto). When offline, the editor falls back to system fonts
 such as Nirmala UI on Windows.
+
+## Support Bhasini
+
+Bhasini is free to use. If it helps you, please consider sponsoring its development:
+
+[![Sponsor via Razorpay](https://img.shields.io/badge/Sponsor%20via-Razorpay-0C2451?style=for-the-badge&logo=razorpay&logoColor=white)](https://razorpay.me/@codegres)

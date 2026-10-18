@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-- Source for the PNG app icons. Rendered at 512, 192 and 180 px by branding/render.sh. -->
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@700&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: transparent; }
+  .icon {
+    width: 100vw; height: 100vh; box-sizing: border-box;
+    background: linear-gradient(135deg, #ff9a3c, #e2531f);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .ring { position: absolute; inset: 17%; border: calc(100vw / 32) solid rgba(255,255,255,.3); border-radius: 50%; }
+  .text {
+    position: relative;
+    font-family: 'Noto Sans Devanagari', 'Nirmala UI', sans-serif;
+    font-weight: 700; color: #fff; font-size: 46vw; line-height: 1; margin-top: -4vw;
+  }
+</style>
+</head>
+<body>
+  <!-- Full-bleed square: platforms apply their own corner masks. -->
+  <div class="icon"><div class="ring"></div><div class="text">भा</div></div>
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 [![Sponsor via Razorpay](https://img.shields.io/badge/Sponsor-Razorpay-0C2451?style=for-the-badge&logo=razorpay&logoColor=white)](https://razorpay.me/@codegres)
 [![Open Bhasini](https://img.shields.io/badge/Open-bhasini.com-f07b2b?style=for-the-badge)](https://bhasini.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2d3a8c?style=for-the-badge)](LICENSE)
 
 A multilingual Indic typing editor for all **22 scheduled languages of India**, built with
 Blazor WebAssembly. Everything runs in the browser; no server round-trips while you type.
@@ -94,3 +95,7 @@ such as Nirmala UI on Windows.
 Bhasini is free to use. If it helps you, please consider sponsoring its development:
 
 [![Sponsor via Razorpay](https://img.shields.io/badge/Sponsor%20via-Razorpay-0C2451?style=for-the-badge&logo=razorpay&logoColor=white)](https://razorpay.me/@codegres)
+
+## License
+
+[MIT](LICENSE) © Codegres

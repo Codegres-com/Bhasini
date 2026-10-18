@@ -1,0 +1,88 @@
+{
+  "name": "bhasini-windows",
+  "version": "1.0.0",
+  "description": "Bhasini: type in all 22 Indian languages on Windows, in the editor or any app with F9",
+  "main": "main.js",
+  "homepage": "https://bhasini.com",
+  "scripts": {
+    "start": "electron .",
+    "package": "node package-app.js",
+    "assets": "python make-assets.py",
+    "dist:unpacked": "npm run package && electron-builder --win --dir",
+    "dist:nsis": "npm run package && electron-builder --win nsis",
+    "dist:portable": "npm run package && electron-builder --win portable",
+    "dist:appx": "npm run package && electron-builder --win appx",
+    "dist:store": "npm run dist:appx",
+    "dist": "npm run package && electron-builder --win nsis portable zip appx dir"
+  },
+  "keywords": [
+    "bhasini",
+    "indian languages",
+    "hindi",
+    "kannada",
+    "tamil",
+    "telugu",
+    "transliteration",
+    "inscript",
+    "keyboard",
+    "windows",
+    "appx",
+    "msix"
+  ],
+  "author": {
+    "name": "Codegres",
+    "email": "contact@codegres.com"
+  },
+  "license": "MIT",
+  "build": {
+    "appId": "com.codegres.bhasini",
+    "productName": "Bhasini",
+    "copyright": "Copyright (c) 2026 Codegres",
+    "files": [
+      "main.js",
+      "global-keyboard.js",
+      "preload.js",
+      "app/**/*",
+      "icon.ico",
+      "icon.png"
+    ],
+    "asarUnpack": [
+      "app/global-keyboard/**"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable",
+        "zip",
+        "dir"
+      ],
+      "icon": "icon.ico",
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Bhasini",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    },
+    "appx": {
+      "backgroundColor": "#1f2a5c",
+      "applicationId": "Bhasini",
+      "identityName": "Codegres.Bhasini",
+      "publisher": "CN=8E441733-851D-4788-B164-6E5BAA080617",
+      "publisherDisplayName": "Codegres",
+      "displayName": "Bhasini",
+      "languages": ["en-IN", "en-US"],
+      "artifactName": "${productName}-${version}-Store.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3"
+  }
+}

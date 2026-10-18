@@ -58,6 +58,14 @@
         <InputFile OnChange="LoadDocument" class="d-none" id="fileUpload" accept=".txt,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
         <label for="fileUpload" class="btn btn-outline-secondary mb-0"><span class="bi bi-folder2-open"></span> Open</label>
         <button class="btn btn-success" @onclick="() => showSave = true"><span class="bi bi-download"></span> Save</button>
+        @if (globalKeyboard != null)
+        {
+            <button class="btn @(globalKeyboard.Enabled ? "btn-warning" : "btn-outline-secondary")"
+                    disabled="@(!globalKeyboard.Available)" @onclick='() => JS.InvokeVoidAsync("bhasini.desktop.toggle")'
+                    title="Type @GlobalLanguageName in any application (browser, Word, Excel, …). Shortcut: F9">
+                <span class="bi bi-globe"></span> Global mode: @(globalKeyboard.Enabled ? "ON" : "OFF")
+            </button>
+        }
     </div>
 </div>
 
@@ -305,6 +313,10 @@
         await ApplyEditorLanguage();
         speechSupported = await JS.InvokeAsync<bool>("bhasini.speech.isSupported");
 
+        // Windows app only: F9 Global mode types the editor's language in every application.
+        globalKeyboard = await JS.InvokeAsync<GlobalKeyboardState?>("bhasini.desktop.init", selfRef);
+        await SyncGlobalKeyboard();
+
         // Every launch starts by asking which language to type; the last one stays highlighted.
         OpenLanguagePicker();
         StateHasChanged();
@@ -345,6 +357,7 @@
         if (listening) await JS.InvokeVoidAsync("bhasini.speech.stop");
         await ApplyEditorLanguage();
         await SaveSettings();
+        await SyncGlobalKeyboard();
         await JS.InvokeVoidAsync("bhasini.editor.focus");
     }
 
@@ -354,7 +367,73 @@
         if (Session.Method != InputMethod.English) lastIndicMethod = Session.Method;
         await JS.InvokeVoidAsync("bhasini.editor.setActive", Session.IsActive);
         await SaveSettings();
+        await SyncGlobalKeyboard();
         await JS.InvokeVoidAsync("bhasini.editor.focus");
+    }
+
+    // ---- Global (Direct Type) keyboard: Windows app only ----
+
+    public sealed class GlobalKeyboardState
+    {
+        public bool Available { get; set; }
+        public bool Enabled { get; set; }
+        public string? Language { get; set; }
+        public string? Method { get; set; }
+    }
+
+    GlobalKeyboardState? globalKeyboard;
+
+    string GlobalLanguageName => LanguageCatalog.Get(globalKeyboard?.Language).Name;
+
+    // Global mode follows the editor's language and keyboard (English keeps the last Indian language).
+    private async Task SyncGlobalKeyboard()
+    {
+        if (globalKeyboard == null) return;
+        if (!Language.IsEnglish && globalKeyboard.Language != Language.Code)
+        {
+            await JS.InvokeVoidAsync("bhasini.desktop.setLanguage", Language.Code);
+        }
+        if (Session.Method != InputMethod.English && globalKeyboard.Method != Session.Method.ToString())
+        {
+            await JS.InvokeVoidAsync("bhasini.desktop.setMethod", Session.Method.ToString());
+        }
+    }
+
+    // State from the helper, including changes made from the tray menu.
+    [JSInvokable]
+    public async Task OnGlobalKeyboardState(GlobalKeyboardState state)
+    {
+        var previous = globalKeyboard;
+        globalKeyboard = state;
+
+        // The helper just (re)started: it takes the editor's language, not the other way round.
+        if (previous == null || !previous.Available)
+        {
+            await SyncGlobalKeyboard();
+            StateHasChanged();
+            return;
+        }
+
+        // Otherwise only follow real changes, i.e. ones made from the tray menu.
+        var language = LanguageCatalog.Get(state.Language);
+        bool changed = false;
+        if (state.Language != previous.Language && !language.IsEnglish && language != Language && !Language.IsEnglish)
+        {
+            Session.SetLanguage(language);
+            changed = true;
+        }
+        if (state.Method != previous.Method && Session.IsActive && Enum.TryParse<InputMethod>(state.Method, out var method) && method != Session.Method)
+        {
+            Session.SetMethod(method);
+            lastIndicMethod = Session.Method;
+            changed = true;
+        }
+        if (changed)
+        {
+            await ApplyEditorLanguage();
+            await SaveSettings();
+        }
+        StateHasChanged();
     }
 
     private async Task ToggleDigits(ChangeEventArgs e)

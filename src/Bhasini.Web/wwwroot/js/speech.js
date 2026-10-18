@@ -7,6 +7,8 @@ window.bhasini.speech = {
     wanted: false,
 
     isSupported: function () {
+        // Electron exposes the API but has no speech service behind it.
+        if (window.bhasiniDesktop) return false;
         return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
     },
 

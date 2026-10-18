@@ -250,6 +250,26 @@ window.bhasini.files = {
     }
 };
 
+// Bridge to the Windows app's Global (Direct Type) keyboard. `window.bhasiniDesktop` is exposed
+// by BhasiniWindows/preload.js; in a normal browser it is absent and these calls do nothing.
+window.bhasini.desktop = {
+    _bridge: function () {
+        return window.bhasiniDesktop && window.bhasiniDesktop.globalKeyboard;
+    },
+
+    // Returns { available, enabled, language, method } in the desktop app, or null in a browser.
+    init: async function (dotNetRef) {
+        const bridge = this._bridge();
+        if (!bridge) return null;
+        bridge.onStateChanged((state) => dotNetRef.invokeMethodAsync('OnGlobalKeyboardState', state));
+        return await bridge.getState();
+    },
+
+    toggle: function () { const b = this._bridge(); if (b) b.toggle(); },
+    setLanguage: function (code) { const b = this._bridge(); if (b) b.setLanguage(code); },
+    setMethod: function (method) { const b = this._bridge(); if (b) b.setMethod(method); }
+};
+
 window.bhasini.storage = {
     key: 'bhasini.settings.v1',
     load: function () {

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    System-wide (Global / Direct Type) Indian-language keyboard for Windows.
+    Spawned and controlled by the Electron shell (main.js); published by package-app.js
+    into app/global-keyboard as a self-contained single-file exe.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>BhasiniGlobalKeyboard</AssemblyName>
+    <RootNamespace>BhasiniGlobalKeyboard</RootNamespace>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishTrimmed>true</PublishTrimmed>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Company>Codegres</Company>
+    <Product>Bhasini</Product>
+    <Copyright>Copyright (c) 2026 Codegres</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Same languages, phonetic and InScript keys as the editor -->
+    <ProjectReference Include="..\..\src\Bhasini.Core\Bhasini.Core.csproj" />
+  </ItemGroup>
+
+</Project>

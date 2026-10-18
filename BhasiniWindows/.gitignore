@@ -1,0 +1,7 @@
+node_modules/
+dist/
+app/
+obj/
+bin/
+GlobalKeyboard/bin/
+GlobalKeyboard/obj/

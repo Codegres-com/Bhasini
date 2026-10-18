@@ -96,6 +96,11 @@ Bhasini is free to use. If it helps you, please consider sponsoring its developm
 
 [![Sponsor via Razorpay](https://img.shields.io/badge/Sponsor%20via-Razorpay-0C2451?style=for-the-badge&logo=razorpay&logoColor=white)](https://razorpay.me/@codegres)
 
+## Windows app
+
+[`BhasiniWindows/`](BhasiniWindows/README.md) packages Bhasini as a Windows desktop app and Microsoft Store AppX.
+It adds **Global mode**: press **F9** to type the selected Indian language in any application.
+
 ## License
 
 [MIT](LICENSE) © Codegres

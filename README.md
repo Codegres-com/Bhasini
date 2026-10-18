@@ -8,30 +8,30 @@ shape: a Quill rich-text editor whose keystrokes are transliterated by a C# engi
 
 ## Languages
 
-| Language | Script | Since |
-|---|---|---|
-| Assamese | Bengali-Assamese (ৰ, ৱ) | 1950 |
-| Bengali | Bengali | 1950 |
-| Bodo | Devanagari | 2003 |
-| Dogri | Devanagari | 2003 |
-| Gujarati | Gujarati | 1950 |
-| Hindi | Devanagari | 1950 |
-| Kannada | Kannada | 1950 |
-| Kashmiri | Perso-Arabic (RTL), also Devanagari | 1950 |
-| Konkani | Devanagari | 1992 |
-| Maithili | Devanagari | 2003 |
-| Malayalam | Malayalam (chillus, Mozhi-style keys) | 1950 |
-| Manipuri | Meetei Mayek (lonsum letters), also Bengali | 1992 |
-| Marathi | Devanagari (ळ) | 1950 |
-| Nepali | Devanagari | 1992 |
-| Odia | Odia | 1950 |
-| Punjabi | Gurmukhi (tippi, bindi, addak) | 1950 |
-| Sanskrit | Devanagari | 1950 |
-| Santali | Ol Chiki | 2003 |
-| Sindhi | Perso-Arabic (RTL), also Devanagari | 1967 |
-| Tamil | Tamil (ந/ன by context, ற, ழ) | 1950 |
-| Telugu | Telugu | 1950 |
-| Urdu | Perso-Arabic, Nastaliq (RTL) | 1950 |
+| Language | Script |
+|---|---|
+| Assamese | Bengali-Assamese (ৰ, ৱ) |
+| Bengali | Bengali |
+| Bodo | Devanagari |
+| Dogri | Devanagari |
+| Gujarati | Gujarati |
+| Hindi | Devanagari |
+| Kannada | Kannada |
+| Kashmiri | Perso-Arabic (RTL), also Devanagari |
+| Konkani | Devanagari |
+| Maithili | Devanagari |
+| Malayalam | Malayalam (chillus, Mozhi-style keys) |
+| Manipuri | Meetei Mayek (lonsum letters), also Bengali |
+| Marathi | Devanagari (ळ) |
+| Nepali | Devanagari |
+| Odia | Odia |
+| Punjabi | Gurmukhi (tippi, bindi, addak) |
+| Sanskrit | Devanagari |
+| Santali | Ol Chiki |
+| Sindhi | Perso-Arabic (RTL), also Devanagari |
+| Tamil | Tamil (ந/ன by context, ற, ழ) |
+| Telugu | Telugu |
+| Urdu | Perso-Arabic, Nastaliq (RTL) |
 
 Plus English (no transliteration).
 

@@ -177,7 +177,7 @@
                             <button class="language-tile @(lang == Language ? "active" : "")" @onclick="() => ChooseLanguage(lang)">
                                 <span class="lt-native @lang.FontClass" dir="auto">@lang.NativeName</span>
                                 <span class="lt-name">@lang.Name</span>
-                                <span class="lt-meta">@lang.ScriptName@(lang.ScheduledSince != null ? $" · since {lang.ScheduledSince}" : "")</span>
+                                <span class="lt-meta">@lang.ScriptName</span>
                             </button>
                         }
                     </div>
@@ -304,6 +304,9 @@
         await JS.InvokeVoidAsync("bhasini.editor.init", "#quill-editor", selfRef);
         await ApplyEditorLanguage();
         speechSupported = await JS.InvokeAsync<bool>("bhasini.speech.isSupported");
+
+        // Every launch starts by asking which language to type; the last one stays highlighted.
+        OpenLanguagePicker();
         StateHasChanged();
     }
 

@@ -6,6 +6,12 @@
       "runtimeExecutable": "dotnet",
       "runtimeArgs": ["run", "--project", "src/Bhasini.Web", "--urls", "http://localhost:35636"],
       "port": 35636
+    },
+    {
+      "name": "bhasini-release",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "35637", "--directory", "publish/wwwroot"],
+      "port": 35637
     }
   ]
 }

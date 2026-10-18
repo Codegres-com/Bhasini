@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Bhasini.SiteGen</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bhasini.Core\Bhasini.Core.csproj" />
+    <!-- The page list is shared with the web app, which opens each page in its language. -->
+    <Compile Include="..\..\src\Bhasini.Web\Site\SitePages.cs" Link="Site\SitePages.cs" />
+  </ItemGroup>
+
+</Project>

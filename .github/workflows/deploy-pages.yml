@@ -30,6 +30,11 @@ jobs:
       - name: Publish
         run: dotnet publish src/Bhasini.Web/Bhasini.Web.csproj -c Release -o publish
 
+      # Landing pages for each language and search intent, plus sitemap.xml and 404.html
+      # (deep links fall back to the Blazor router through 404.html).
+      - name: Generate landing pages
+        run: dotnet run --project tools/Bhasini.SiteGen -c Release -- publish/wwwroot https://bhasini.com
+
       - name: Prepare site
         run: |
           cd publish/wwwroot
@@ -37,8 +42,6 @@ jobs:
           echo "bhasini.com" > CNAME
           # Serve _framework and other underscore folders as-is
           touch .nojekyll
-          # Deep links fall back to the Blazor router
-          cp index.html 404.html
 
       - uses: actions/configure-pages@v5
 

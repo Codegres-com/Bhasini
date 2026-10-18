@@ -22,7 +22,7 @@ html, body {
     font-family: 'Poppins', 'Nirmala UI', system-ui, sans-serif;
     background: var(--canvas);
     color: #222;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* Script fonts: web fonts first, then the system fonts that cover each script offline. */
@@ -365,6 +365,59 @@ html, body {
 }
 
 #blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: .75rem; top: .5rem; }
+
+/* ---------- Landing page text (below the editor, written by tools/Bhasini.SiteGen) ---------- */
+
+.site-content {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+    line-height: 1.65;
+}
+
+.site-content h1 { font-size: 1.7rem; font-weight: 700; color: var(--ink); margin: 0 0 .4rem; }
+.site-content h2 { font-size: 1.2rem; font-weight: 600; color: var(--ink); margin: 2rem 0 .6rem; }
+.site-content h3 { font-size: 1rem; font-weight: 600; margin: 1.2rem 0 .4rem; }
+.site-content .lead { font-size: 1.05rem; color: var(--ink-soft); }
+.site-content .native { font-size: 1.25em; color: var(--ink); }
+.site-content a { color: var(--bs-primary); }
+
+.site-content .start-typing {
+    display: inline-block;
+    margin: .6rem 0 0;
+    padding: .45rem 1rem;
+    border-radius: 8px;
+    background: var(--saffron);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.site-content table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 10px; overflow: hidden; }
+.site-content th, .site-content td { padding: .5rem .8rem; border-bottom: 1px solid var(--line); text-align: start; vertical-align: top; }
+.site-content th { background: #faf8f3; font-weight: 600; font-size: .85rem; color: var(--muted); }
+.site-content td code { color: var(--ink); background: #f1eee6; padding: .1rem .35rem; border-radius: 4px; }
+
+.site-content .key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+.site-content .key-grid div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 4px; text-align: center; }
+.site-content .key-grid .out { display: block; font-size: 1.35rem; line-height: 1.5; color: var(--ink); }
+.site-content .key-grid code { font-size: .8rem; color: var(--muted); }
+
+.site-content .inscript { display: flex; flex-direction: column; gap: 4px; overflow-x: auto; }
+.site-content .inscript-line { display: flex; gap: 4px; }
+.site-content .inscript-line div { min-width: 48px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; text-align: center; padding: 2px 0; }
+.site-content .inscript-line .up { display: block; font-size: .85rem; color: var(--muted); min-height: 1.3em; }
+.site-content .inscript-line .lo { display: block; font-size: 1.2rem; color: var(--ink); min-height: 1.5em; }
+.site-content .inscript-line code { font-size: .7rem; color: var(--muted); }
+
+.site-content .link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; padding: 0; list-style: none; }
+.site-content .link-grid a { display: block; padding: .5rem .7rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; text-decoration: none; color: var(--ink); }
+.site-content .link-grid a:hover { border-color: var(--saffron); }
+.site-content .link-grid small { display: block; color: var(--muted); }
+
+.site-content details { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: .6rem .9rem; margin-bottom: 8px; }
+.site-content summary { font-weight: 600; cursor: pointer; }
+.site-content details p { margin: .5rem 0 0; }
 
 /* ---------- Small screens ---------- */
 

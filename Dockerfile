@@ -4,7 +4,9 @@ COPY src/Bhasini.Core/Bhasini.Core.csproj src/Bhasini.Core/
 COPY src/Bhasini.Web/Bhasini.Web.csproj src/Bhasini.Web/
 RUN dotnet restore src/Bhasini.Web/Bhasini.Web.csproj
 COPY src/ src/
+COPY tools/ tools/
 RUN dotnet publish src/Bhasini.Web/Bhasini.Web.csproj -c Release -o /app/publish
+RUN dotnet run --project tools/Bhasini.SiteGen -c Release -- /app/publish/wwwroot https://bhasini.com
 
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html

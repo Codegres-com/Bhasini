@@ -1,9 +1,11 @@
 @page "/"
+@page "/{Slug}"
 @inject TypingSession Session
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 @implements IDisposable
 
-<PageTitle>Bhasini — @Language.Name typing</PageTitle>
+<PageTitle>@(landing?.Title ?? "Bhasini — Type in all 22 Indian languages")</PageTitle>
 
 <div id="main-toolbar" class="toolbar">
     <div class="toolbar-group">
@@ -262,6 +264,12 @@
 }
 
 @code {
+    // Landing pages (/hindi-typing/, /tamil-keyboard/, …) open the editor in their language.
+    [Parameter] public string? Slug { get; set; }
+
+    SitePage? landing;
+    string? loadedSlug;
+
     IndicLanguage Language => Session.Language;
 
     bool showKeymap;
@@ -294,6 +302,22 @@
         ? LanguageCatalog.All.Where(l => !l.IsEnglish)
         : LanguageCatalog.All.Where(ScriptConverter.CanConvertTo);
 
+    protected override void OnInitialized()
+    {
+        loadedSlug = Slug;
+        landing = SitePages.Find(Slug);
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Each landing page is its own static HTML file with its own text, so a link from one to
+        // another (or back to the home page) loads that file instead of switching in place.
+        if (!string.Equals(Slug, loadedSlug, StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -307,6 +331,12 @@
             Session.NativeDigits = settings.NativeDigits;
             showKeymap = settings.ShowKeymap;
         }
+        if (landing?.Language != null)
+        {
+            Session.SetLanguage(landing.Language);
+            if (Session.Method == InputMethod.English) Session.SetMethod(InputMethod.Phonetic);
+            if (landing.ShowKeymap) showKeymap = true;
+        }
         if (Session.Method != InputMethod.English) lastIndicMethod = Session.Method;
 
         await JS.InvokeVoidAsync("bhasini.editor.init", "#quill-editor", selfRef);
@@ -318,7 +348,8 @@
         await SyncGlobalKeyboard();
 
         // Every launch starts by asking which language to type; the last one stays highlighted.
-        OpenLanguagePicker();
+        // A language landing page has already answered that.
+        if (landing?.Language == null) OpenLanguagePicker();
         StateHasChanged();
     }
 

@@ -542,6 +542,7 @@ namespace Bhasini.SiteGen
             }
             Url("/mcp/", "monthly", "0.6");
             Url("/privacy.html", "yearly", "0.3");
+            Url("/terms.html", "yearly", "0.3");
             return b.Append("</urlset>\n").ToString();
         }
     }

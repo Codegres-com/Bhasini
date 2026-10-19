@@ -34,7 +34,7 @@ On first use, `dnx` downloads the pinned Bhasini.Mcp package from NuGet.org. Aft
 - **Usage and storage:** text passed to the tools is processed in memory on your computer and discarded when the call returns.
 - **Third-party sharing:** none. The server makes no network requests.
 - **Data retention:** none.
-- **Contact:** contact@codegres.com · https://bhasini.com/privacy.html
+- **Contact:** naveen@codegres.com · https://bhasini.com/privacy.html
 
 ## License
 

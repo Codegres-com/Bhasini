@@ -78,7 +78,7 @@ args = ["Bhasini.Mcp", "--yes"]
 - **Usage and storage:** text sent to the tools is processed in memory on your computer and discarded when the call returns. Nothing is written to disk.
 - **Third-party sharing:** none. The server makes no network requests. Your MCP client (for example Claude or ChatGPT) handles the conversation under its own privacy policy.
 - **Data retention:** none. No data is kept after a tool call returns.
-- **Contact:** contact@codegres.com · full policy at https://bhasini.com/privacy.html
+- **Contact:** naveen@codegres.com · full policy at https://bhasini.com/privacy.html
 
 ## License
 

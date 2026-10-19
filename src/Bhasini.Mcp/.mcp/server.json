@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "name": "io.github.codegres-com/bhasini",
   "version": "0.1.0",
-  "description": "Indic MCP: transliterate into all 22 Indian languages, convert scripts, keymaps. Local.",
+  "description": "Indic MCP: transliterate into all 22 Indian languages, convert scripts, keymaps. Hosted or local.",
   "title": "Bhasini Indic Languages",
   "websiteUrl": "https://bhasini.com/mcp/",
   "packages": [
@@ -16,6 +16,12 @@
       },
       "packageArguments": [],
       "environmentVariables": []
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.bhasini.com/mcp"
     }
   ],
   "repository": {

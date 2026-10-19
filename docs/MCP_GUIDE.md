@@ -99,7 +99,11 @@ ChatGPT's directory (now "Plugins", shared by ChatGPT and Codex) **requires a re
 shown on bhasini.com/mcp/). OpenAI mentions a desktop-only path for approved local MCP plugins, but
 its details aren't public, so don't plan around it.
 
-**With the remote server (once deployed):**
+**Ready-to-upload kit:** [CHATGPT_SUBMISSION.md](CHATGPT_SUBMISSION.md) has the listing text,
+the 5 + 3 test cases, the demo video script and the upload package (`docs/chatgpt-plugin/`). The
+summary below is kept for reference.
+
+**With the remote server (deployed):**
 1. In the OpenAI Platform, complete **business verification** for Codegres (Organization settings). Only owners, or members with *Apps Management Write*, can submit.
 2. Prepare four public HTTPS URLs from the same publisher: website (`https://bhasini.com`), support, privacy policy and **terms of service**. *We don't have a terms page yet, so it must be written.*
 3. Build the plugin ZIP with `mcp.json` pointing at `https://mcp.bhasini.com/mcp`, auth type `none`. Keep `displayName` and `shortDescription` to 30 characters or fewer (e.g. "Bhasini" / "Indian language scripts"). Icon: square PNG/SVG, at least 48×48.

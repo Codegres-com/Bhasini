@@ -16,4 +16,9 @@
     <ProjectReference Include="..\Bhasini.Core\Bhasini.Core.csproj" />
   </ItemGroup>
 
+  <!-- The SDK skips dot-folders; publish .well-known (domain verification files such as OpenAI's). -->
+  <ItemGroup>
+    <Content Update="wwwroot\.well-known\**" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

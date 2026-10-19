@@ -31,6 +31,16 @@ if (!template.Contains(Pages.Placeholder))
     return 1;
 }
 
+// The site's own CSS and JS have fixed names and GitHub Pages caches them for 10 minutes, so a
+// visitor could get new WebAssembly with an old editor.js. A content hash in each URL changes
+// whenever the file does.
+foreach (var asset in new[] { "css/app.css", "js/editor.js", "js/speech.js" })
+{
+    var bytes = File.ReadAllBytes(Path.Combine(root, asset));
+    var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes))[..10].ToLowerInvariant();
+    template = Pages.Replace(template, $"\"{asset}\"", $"\"{asset}?v={hash}\"");
+}
+
 var duplicate = SitePages.All.GroupBy(p => p.Slug).FirstOrDefault(g => g.Count() > 1);
 if (duplicate != null)
 {

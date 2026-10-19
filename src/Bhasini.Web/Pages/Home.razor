@@ -31,11 +31,13 @@
         {
             <div class="form-check form-switch m-0" title="Type digits in the native script">
                 <input class="form-check-input" type="checkbox" id="nativeDigits" checked="@Session.NativeDigits" @onchange="ToggleDigits">
-                <label class="form-check-label small" for="nativeDigits">@NativeDigitSample digits</label>
+                <label class="form-check-label small" for="nativeDigits">@NativeDigitSample<span class="btn-label"> digits</span></label>
             </div>
         }
     </div>
 
+    @* On phones this becomes one swipeable row of icon buttons; on wider screens it lays out as before. *@
+    <div class="toolbar-actions">
     <div class="toolbar-group">
         <div class="btn-group" role="group">
             <button class="btn btn-outline-secondary" @onclick='() => Editor("undo")' title="Undo"><span class="bi bi-arrow-counterclockwise"></span></button>
@@ -43,23 +45,23 @@
             <button id="btn-copy" class="btn btn-outline-secondary" title="Copy"><span class="bi bi-clipboard"></span></button>
         </div>
         <button class="btn @(showKeymap ? "btn-secondary" : "btn-outline-secondary")" @onclick="ToggleKeymap" title="Show the keys for this language">
-            <span class="bi bi-keyboard"></span> Keys
+            <span class="bi bi-keyboard"></span><span class="btn-label"> Keys</span>
         </button>
         <button class="btn btn-outline-secondary" @onclick="OpenConvert" title="Convert text between Indian scripts">
-            <span class="bi bi-arrow-left-right"></span> Convert
+            <span class="bi bi-arrow-left-right"></span><span class="btn-label"> Convert</span>
         </button>
         @if (speechSupported && Language.SpeechLocale != null)
         {
             <button class="btn @(listening ? "btn-danger" : "btn-outline-secondary")" @onclick="ToggleSpeech" title="Dictate in @Language.Name">
-                <span class="bi @(listening ? "bi-mic-fill" : "bi-mic")"></span> @(listening ? "Stop" : "Speak")
+                <span class="bi @(listening ? "bi-mic-fill" : "bi-mic")"></span><span class="btn-label"> @(listening ? "Stop" : "Speak")</span>
             </button>
         }
     </div>
 
     <div class="toolbar-group ms-auto">
         <InputFile OnChange="LoadDocument" class="d-none" id="fileUpload" accept=".txt,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-        <label for="fileUpload" class="btn btn-outline-secondary mb-0"><span class="bi bi-folder2-open"></span> Open</label>
-        <button class="btn btn-success" @onclick="() => showSave = true"><span class="bi bi-download"></span> Save</button>
+        <label for="fileUpload" class="btn btn-outline-secondary mb-0" title="Open a .txt or .docx file"><span class="bi bi-folder2-open"></span><span class="btn-label"> Open</span></label>
+        <button class="btn btn-success" @onclick="() => showSave = true" title="Save as Word, text or web page"><span class="bi bi-download"></span> Save</button>
         @if (globalKeyboard != null)
         {
             <button class="btn @(globalKeyboard.Enabled ? "btn-warning" : "btn-outline-secondary")"
@@ -69,16 +71,17 @@
             </button>
         }
     </div>
+    </div>
 </div>
 
 <div class="status-bar">
     @if (Session.IsActive)
     {
         <span class="status-dot on"></span>
-        <span>Typing <strong>@Language.Name</strong> in @Language.ScriptName (@MethodLabel)</span>
+        <span class="status-typing">Typing <strong>@Language.Name</strong> in @Language.ScriptName (@MethodLabel)</span>
         @if (Session.Method == InputMethod.Phonetic && Language.SampleInput.Length > 0)
         {
-            <span class="status-hint">Try: <code>@Language.SampleInput</code> → <span class="@Language.FontClass">@Language.Sample</span></span>
+            <span class="status-hint status-try">Try: <code>@Language.SampleInput</code> → <span class="@Language.FontClass">@Language.Sample</span></span>
         }
     }
     else
@@ -170,7 +173,7 @@
 {
     <div class="modal-backdrop show"></div>
     <div class="modal show d-block" tabindex="-1" @onclick="CloseModals">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" @onclick:stopPropagation>
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-sm-down language-modal" @onclick:stopPropagation>
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
@@ -390,6 +393,30 @@
         await SaveSettings();
         await SyncGlobalKeyboard();
         await JS.InvokeVoidAsync("bhasini.editor.focus");
+        await ShowLandingPageFor(lang);
+    }
+
+    // The instructions below the editor follow the language: /hindi-typing/ becomes /tamil-typing/
+    // (the same kind of page where the language has one), with its text, title and URL, and the
+    // editor keeps what was typed. The script converter page keeps its own text.
+    private async Task ShowLandingPageFor(IndicLanguage lang)
+    {
+        if (landing?.Kind == SitePageKind.ScriptConverter) return;
+        var target = SitePages.ForLanguage(lang, landing?.Kind);
+        if (target == null || target == landing) return;
+        try
+        {
+            if (!await JS.InvokeAsync<bool>("bhasini.site.load", target.Path)) return;
+        }
+        catch (JSException)
+        {
+            // An older cached editor.js without bhasini.site: keep the current page text.
+            return;
+        }
+
+        landing = target;
+        loadedSlug = target.Slug;
+        Navigation.NavigateTo(target.Path);
     }
 
     private async Task SetMethod(InputMethod method)

@@ -65,6 +65,16 @@ namespace Bhasini.Web.Site
             return pages;
         }
 
+        // The page to show for a language: the same kind as the current page when the language has
+        // one (tamil-keyboard → kannada-keyboard), otherwise its typing page. Script variants
+        // (Kashmiri in Devanagari, …) share their language's pages. Null for English.
+        public static SitePage? ForLanguage(IndicLanguage language, SitePageKind? preferredKind)
+        {
+            var code = language.Code.Split('-')[0];
+            var pages = All.Where(p => p.Language?.Code == code).ToList();
+            return pages.FirstOrDefault(p => p.Kind == preferredKind) ?? pages.FirstOrDefault(p => p.Kind == SitePageKind.Typing);
+        }
+
         public static SitePage? Find(string? slug) =>
             string.IsNullOrEmpty(slug) ? null : All.FirstOrDefault(p => string.Equals(p.Slug, slug.Trim('/'), StringComparison.OrdinalIgnoreCase));
     }

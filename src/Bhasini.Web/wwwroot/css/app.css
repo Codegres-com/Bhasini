@@ -425,13 +425,108 @@ html, body {
     .keymap-panel { position: fixed; right: 0; top: 0; bottom: 0; width: min(360px, 92vw); z-index: 1040; border-radius: 0; box-shadow: -8px 0 24px rgba(0, 0, 0, .15); }
 }
 
+/* Wider screens: the actions wrapper is invisible to layout, so the toolbar wraps as before. */
+.toolbar-actions { display: contents; }
+
 @media (max-width: 640px) {
-    .app-header { padding: 8px 14px; }
+    /* Header: one slim bar, so the editor gets the screen. */
+    .app-header { padding: 6px 12px; gap: 10px; }
+    .app-logo { width: 32px; height: 32px; }
+    .app-title { font-size: 1.1rem; }
     .app-tagline { display: none; }
-    .app-main { padding: 8px 8px 0; }
-    .toolbar { padding: 8px; gap: 8px; }
-    .toolbar-group.ms-auto { margin-left: 0 !important; }
-    .status-hint.ms-auto { display: none; }
-    .ql-editor { font-size: 1.3rem; padding: 14px 16px; }
+    .app-main { padding: 6px 8px 0; gap: 6px; }
     .app-footer { display: none; }
+
+    /* Toolbar: language + keyboard on the first row, then one swipeable row of icon buttons. */
+    .toolbar { padding: 6px; gap: 6px; border-radius: 10px; }
+    .toolbar-group { flex-wrap: nowrap; gap: 6px; }
+    .toolbar .btn { font-size: .85rem; padding: .32rem .6rem; }
+    .btn-lang { padding: 3px 10px; gap: 6px; }
+    .lang-native { font-size: 1.05rem; }
+    .method-switch .btn { padding: .32rem .45rem; font-size: .8rem; }
+    .toolbar .form-switch { padding-left: 2.1em; }
+    .toolbar .form-switch .form-check-input { margin-left: -2.1em; }
+    .btn-label { display: none; }
+
+    .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        /* Fade at the right edge hints that the row scrolls. */
+        mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+        padding-right: 24px;
+    }
+    .toolbar-actions::-webkit-scrollbar { display: none; }
+    .toolbar-actions .toolbar-group { flex-shrink: 0; }
+    /* Open and Save first: Save is the main action and must not hide under the fade. */
+    .toolbar-actions .toolbar-group.ms-auto { order: -1; }
+    .toolbar-actions .btn { min-width: 40px; min-height: 36px; }
+    .toolbar-group.ms-auto { margin-left: 0 !important; }
+
+    /* Status: just the hint, on one line. */
+    .status-bar { flex-wrap: nowrap; overflow: hidden; white-space: nowrap; font-size: .78rem; }
+    .status-typing, .status-hint.ms-auto { display: none; }
+    .status-try { overflow: hidden; text-overflow: ellipsis; }
+    .status-message { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 1050; white-space: nowrap; }
+
+    /* Editor: the formatting bar is one row with the less-used controls hidden. */
+    .ql-toolbar.ql-snow { padding: 4px 6px; white-space: nowrap; overflow: hidden; }
+    .ql-toolbar.ql-snow .ql-formats { margin-right: 6px; }
+    .ql-toolbar .ql-formats:nth-child(1) .ql-size,
+    .ql-toolbar .ql-formats:nth-child(3),
+    .ql-toolbar .ql-strike,
+    .ql-toolbar .ql-indent,
+    .ql-toolbar .ql-formats:nth-child(5) .ql-align,
+    .ql-toolbar .ql-blockquote { display: none !important; }
+    .ql-editor { font-size: 1.3rem; padding: 14px 16px; }
+    .ql-editor.ql-blank::before { left: 16px; right: 16px; }
+
+    /* Keys: a bottom sheet, so the text stays visible while tapping letters. */
+    .keymap-panel {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        width: 100%;
+        height: min(48dvh, 420px);
+        z-index: 1040;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, .18);
+    }
+    .keymap-header { padding: 10px 14px; }
+    .keymap-grid { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); }
+    .km-out { font-size: 1.25rem; }
+    .inscript-key { width: calc((100vw - 64px) / 13); min-width: 22px; }
+
+    /* Language picker: full screen, three columns, so every language shows at a glance. */
+    .language-modal .modal-header { padding: 12px 16px; }
+    .language-modal .modal-title { font-size: 1.1rem; }
+    .language-modal .modal-header .small { display: none; }
+    .language-modal .modal-body { padding: 0 12px 16px; }
+    .language-modal .modal-body > input { position: sticky; top: 0; z-index: 1; margin: 0 -12px 10px !important; width: calc(100% + 24px); border-radius: 0; border-width: 0 0 1px; padding: 12px 16px; }
+    .language-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .language-tile { align-items: center; text-align: center; padding: 10px 4px; border-radius: 10px; }
+    .language-tile:hover { transform: none; }
+    .lt-native { font-size: 1.2rem; line-height: 1.5; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lt-name { font-size: .78rem; }
+    .lt-meta { display: none; }
+
+    /* Landing text below the editor. */
+    .site-content { padding: 24px 16px 40px; }
+    .site-content h1 { font-size: 1.45rem; }
+    .site-content h2 { font-size: 1.1rem; margin-top: 1.6rem; }
+    .site-content .lead { font-size: 1rem; }
+    .site-content th, .site-content td { padding: .45rem .55rem; }
+    .site-content .link-grid { grid-template-columns: repeat(2, 1fr); }
+    .site-content .key-grid { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
+}
+
+@media (max-width: 380px) {
+    .lang-name { display: none; }
+    .app-title-native { display: none; }
 }

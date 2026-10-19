@@ -284,3 +284,40 @@ window.bhasini.storage = {
         try { localStorage.setItem(this.key, JSON.stringify(settings)); } catch { }
     }
 };
+
+// Landing pages: when the language changes, bring in the text of that language's page (built by
+// tools/Bhasini.SiteGen) without reloading the app. Returns false when there is no such page,
+// e.g. under `dotnet run`, where nothing was generated.
+window.bhasini.site = {
+    load: async function (path) {
+        try {
+            const current = document.querySelector('.site-content');
+            if (!current) return false;
+            const response = await fetch(path, { headers: { Accept: 'text/html' } });
+            if (!response.ok) return false;
+            const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const fresh = page.querySelector('.site-content');
+            if (!fresh) return false;
+
+            current.replaceWith(document.importNode(fresh, true));
+            const selectors = [
+                'meta[name="description"]', 'link[rel="canonical"]', 'meta[property="og:url"]',
+                'meta[property="og:title"]', 'meta[property="og:description"]',
+                'meta[name="twitter:title"]', 'meta[name="twitter:description"]',
+            ];
+            for (const selector of selectors) {
+                const from = page.head.querySelector(selector);
+                const to = document.head.querySelector(selector);
+                if (!from || !to) continue;
+                for (const attr of ['content', 'href']) {
+                    if (from.hasAttribute(attr)) to.setAttribute(attr, from.getAttribute(attr));
+                }
+            }
+            document.head.querySelectorAll('script[type="application/ld+json"]').forEach(s => s.remove());
+            page.head.querySelectorAll('script[type="application/ld+json"]').forEach(s => document.head.appendChild(document.importNode(s, true)));
+            return true;
+        } catch {
+            return false;
+        }
+    }
+};

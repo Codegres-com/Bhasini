@@ -53,41 +53,31 @@
             {
               "description": "Romanised Tamil words written in Tamil script",
               "prompt": "Write the Tamil words vaNakkam and nanRi in Tamil script.",
-              "tools_triggered": [
-                "transliterate"
-              ],
+              "tools_triggered": "transliterate",
               "expected_behavior": "Calls transliterate with language ta and replies with வணக்கம் and நன்றி."
             },
             {
               "description": "Hindi text rewritten in Kannada script",
               "prompt": "Rewrite नमस्ते भारत in Kannada script so a Kannada reader can read it aloud.",
-              "tools_triggered": [
-                "convert_script"
-              ],
+              "tools_triggered": "convert_script",
               "expected_behavior": "Calls convert_script with targetLanguage kn and replies with ನಮಸ್ತೇ ಭಾರತ, noting the words are still Hindi."
             },
             {
               "description": "Keyboard keys for a Tamil letter",
               "prompt": "Which keys do I press to type ழ on a Tamil phonetic keyboard?",
-              "tools_triggered": [
-                "get_keymap"
-              ],
+              "tools_triggered": "get_keymap",
               "expected_behavior": "Calls get_keymap with language ta and answers that zh (or Lx) types ழ."
             },
             {
               "description": "A year written in native numerals",
               "prompt": "Write the year 2026 in Devanagari numerals and in Bengali numerals.",
-              "tools_triggered": [
-                "native_digits"
-              ],
+              "tools_triggered": "native_digits",
               "expected_behavior": "Calls native_digits for hi and bn and replies with २०२६ and ২০২৬."
             },
             {
               "description": "Language code and script lookup",
               "prompt": "Which language code and script does Bhasini use for Santali?",
-              "tools_triggered": [
-                "list_languages"
-              ],
+              "tools_triggered": "list_languages",
               "expected_behavior": "Calls list_languages and answers that Santali is sat, written in Ol Chiki (ᱥᱟᱱᱛᱟᱲᱤ)."
             }
           ],

@@ -95,6 +95,14 @@ Run every positive case yourself before submitting. OpenAI asks you to.
 
 ## 4. Upload steps
 
+**No video yet?** Build a draft package and upload it now, to run the portal's metadata checks and
+tool scan early. Run from the repo root:
+```bash
+python tools/chatgpt-plugin/build_manifest.py --draft
+```
+This writes `artifacts/bhasini-chatgpt-plugin-draft.zip`, the same package without `demo_recording_url`.
+It can't be submitted for review: once the video exists, set the URL and build the real package with `--zip`.
+
 1. Set `DEMO_VIDEO_URL` in `tools/chatgpt-plugin/build_manifest.py`, then build the package from the repo root:
    ```bash
    python tools/chatgpt-plugin/build_manifest.py --zip

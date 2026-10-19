@@ -1,7 +1,11 @@
 """Writes docs/chatgpt-plugin/plugin.json for the ChatGPT plugin submission and checks OpenAI's limits.
 
-Run from the repo root:  python tools/chatgpt-plugin/build_manifest.py
-Then zip the contents of docs/chatgpt-plugin (not the folder itself) and upload at platform.openai.com/plugins.
+Run from the repo root:
+  python tools/chatgpt-plugin/build_manifest.py           check limits, write plugin.json
+  python tools/chatgpt-plugin/build_manifest.py --zip     also build artifacts/bhasini-chatgpt-plugin.zip (needs DEMO_VIDEO_URL)
+  python tools/chatgpt-plugin/build_manifest.py --draft   build artifacts/bhasini-chatgpt-plugin-draft.zip without the video,
+                                                          to upload a draft and run the portal's checks early
+Upload the zip at platform.openai.com/plugins.
 Limits: https://developers.openai.com/apps-sdk/deploy/submission
 """
 import json
@@ -194,17 +198,30 @@ if __name__ == "__main__":
 
     # --zip: the upload package, with forward-slash paths and the files at the zip root.
     # (Windows PowerShell 5.1's Compress-Archive writes backslash paths, which validators can reject.)
-    if "--zip" in sys.argv:
+    # --draft: the same package without demo_recording_url, for uploading a draft and running the
+    # portal's checks before the demo video exists. It can't be submitted for review as is.
+    draft = "--draft" in sys.argv
+    if "--zip" in sys.argv or draft:
+        packaged = manifest
         if DEMO_VIDEO_URL.startswith("REPLACE"):
-            print("Not zipping: set DEMO_VIDEO_URL first.")
-            sys.exit(1)
+            if not draft:
+                print("Not zipping: set DEMO_VIDEO_URL first, or use --draft to build a draft package without it.")
+                sys.exit(1)
+            packaged = json.loads(json.dumps(manifest))
+            del packaged["extensions"]["com.openai"]["review"]["demo_recording_url"]
         import zipfile
         out_dir = os.path.normpath(os.path.join(root, "..", "..", "artifacts"))
         os.makedirs(out_dir, exist_ok=True)
-        out = os.path.join(out_dir, "bhasini-chatgpt-plugin.zip")
+        out = os.path.join(out_dir, "bhasini-chatgpt-plugin-draft.zip" if draft else "bhasini-chatgpt-plugin.zip")
         with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
             for folder, _, files in os.walk(root):
                 for name in sorted(files):
                     full = os.path.join(folder, name)
-                    z.write(full, os.path.relpath(full, root).replace(os.sep, "/"))
+                    rel = os.path.relpath(full, root).replace(os.sep, "/")
+                    if rel == "plugin.json":
+                        z.writestr(rel, json.dumps(packaged, ensure_ascii=False, indent=2) + "\n")
+                    else:
+                        z.write(full, rel)
         print(f"Wrote {out}")
+        if draft:
+            print("DRAFT: upload it to test the portal checks. Add the demo video URL and rebuild with --zip before submitting for review.")

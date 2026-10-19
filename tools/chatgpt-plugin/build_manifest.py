@@ -12,7 +12,7 @@ import json
 import os
 import sys
 
-DEMO_VIDEO_URL = "REPLACE_WITH_DEMO_VIDEO_URL"  # an unlisted YouTube or Drive link reviewers can open
+DEMO_VIDEO_URL = "https://youtu.be/uA634C1x7o8"  # an unlisted YouTube or Drive link reviewers can open
 
 LONG_DESCRIPTION = """Bhasini gives ChatGPT exact, rule-based spelling for all 22 scheduled languages of India: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu.
 

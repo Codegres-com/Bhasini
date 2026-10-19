@@ -8,7 +8,7 @@ Status: **local server, package, plugin, docs page and remote (Cloudflare Worker
 |---|---|---|
 | MCP server | `src/Bhasini.Mcp/` | C# stdio server on the [MCP C# SDK](https://www.nuget.org/packages/ModelContextProtocol) 2.2.0, reusing `Bhasini.Core`. Five read-only tools: `list_languages`, `transliterate`, `convert_script`, `get_keymap`, `native_digits` |
 | NuGet / .NET tool package | `dotnet pack src/Bhasini.Mcp` | `Bhasini.Mcp` 0.1.0, package type `McpServer`, command `bhasini-mcp`, includes `README.md` (with the `mcp-name` marker and Privacy Policy) and `.mcp/server.json` |
-| Registry manifest | `src/Bhasini.Mcp/.mcp/server.json` | Official MCP Registry entry `io.github.codegres-com/bhasini` |
+| Registry manifest | `src/Bhasini.Mcp/.mcp/server.json` | Official MCP Registry entry `io.github.Codegres-com/bhasini` |
 | Claude plugin | `plugins/bhasini/` | Plugin manifest + `.mcp.json` (`dnx Bhasini.Mcp@0.1.0 --yes`) + `indic-text` skill + README + LICENSE. Passes `claude plugin validate` |
 | Static docs page | `src/Bhasini.Web/wwwroot/mcp/index.html` → **https://bhasini.com/mcp/** | Install instructions for every client. In the sitemap and linked from the home page |
 | Release workflow | `.github/workflows/publish-mcp.yml` | On tag `mcp-vX.Y.Z`: test → pack → push to NuGet → publish to the MCP Registry |
@@ -46,16 +46,26 @@ exception: a local server can be listed when it is wrapped in a **plugin**, whic
 
 ## Step 1: publish the package (one-time setup)
 
-1. Create a NuGet.org account under Codegres, make an API key scoped to `Bhasini.Mcp`, and save it as the repository secret `NUGET_API_KEY`.
-2. Push the code, then tag a release:
+No API keys are stored. NuGet uses **Trusted Publishing** and the MCP Registry uses **GitHub OIDC**.
+
+1. On nuget.org → your name → **Trusted Publishing**, keep this policy (already created, and it shows Active):
+   package owner **Codegres**, repository owner **Codegres-com**, repository **Bhasini**, workflow
+   **publish-mcp.yml**, environment **main**. "Environment" means a GitHub Actions *environment*, not a
+   branch; the workflow's job declares `environment: main` to match, and GitHub creates it on the first run.
+   If the policy shows "temporarily active", it must be used within 7 days.
+2. In GitHub → Settings → Secrets and variables → Actions, add **`NUGET_USER`**: the nuget.org
+   **profile name** (not the email) of the account that created the policy.
+3. Tag a release:
    ```bash
    git tag mcp-v0.1.0
    ```
    ```bash
    git push origin mcp-v0.1.0
    ```
-3. The workflow pushes to NuGet, waits for validation, and publishes `server.json` to the
-   [Official MCP Registry](https://registry.modelcontextprotocol.io/). The registry feeds the GitHub
+4. The workflow exchanges GitHub's token for a one-hour NuGet key, pushes the package, waits for NuGet
+   validation, and publishes `server.json` to the
+   [Official MCP Registry](https://registry.modelcontextprotocol.io/) as `io.github.Codegres-com/bhasini`.
+   The capital C matters: the registry matches the GitHub owner name exactly. The registry feeds the GitHub
    MCP Registry, VS Code's MCP gallery and other catalogs.
 
 When you bump the version, update `<Version>` in the csproj, both versions in `server.json`, the

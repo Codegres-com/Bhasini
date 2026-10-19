@@ -1,6 +1,6 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
-  "name": "io.github.codegres-com/bhasini",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Codegres-com/bhasini",
   "version": "0.1.0",
   "description": "Indic MCP: transliterate into all 22 Indian languages, convert scripts, keymaps. Hosted or local.",
   "title": "Bhasini Indic Languages",

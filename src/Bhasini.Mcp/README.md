@@ -1,6 +1,6 @@
 # Bhasini MCP: Indian languages for AI assistants
 
-<!-- mcp-name: io.github.codegres-com/bhasini -->
+<!-- mcp-name: io.github.Codegres-com/bhasini -->
 
 An [MCP](https://modelcontextprotocol.io) server that gives Claude, ChatGPT (Codex), Cursor, VS Code and
 other MCP clients exact, rule-based tools for all **22 scheduled languages of India**. It uses the same

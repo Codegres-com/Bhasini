@@ -1,20 +1,36 @@
 name: Publish MCP server
 
 # Push a tag like mcp-v0.1.0 to publish Bhasini.Mcp to NuGet.org and the Official MCP Registry.
-# Needs the NUGET_API_KEY repository secret. The version in the tag must match <Version> in
-# src/Bhasini.Mcp/Bhasini.Mcp.csproj and both versions in src/Bhasini.Mcp/.mcp/server.json.
+# The version in the tag must match <Version> in src/Bhasini.Mcp/Bhasini.Mcp.csproj, both versions
+# in src/Bhasini.Mcp/.mcp/server.json and the pin in plugins/bhasini/.mcp.json.
+#
+# No long-lived keys: NuGet uses Trusted Publishing (policy on nuget.org: owner Codegres-com,
+# repository Bhasini, workflow publish-mcp.yml, environment main) and the MCP Registry uses GitHub
+# OIDC. The only setting needed is the NUGET_USER repository secret: the nuget.org profile name
+# (not email) of the account that created the trusted publishing policy.
 on:
   push:
     tags: ['mcp-v*']
 
 permissions:
   contents: read
-  id-token: write # GitHub OIDC login to the MCP Registry
+  id-token: write # GitHub OIDC: NuGet Trusted Publishing and the MCP Registry login
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Must match the Environment field of the NuGet trusted publishing policy.
+    environment: main
     steps:
+      - name: Check the NUGET_USER secret is set
+        env:
+          NUGET_USER: ${{ secrets.NUGET_USER }}
+        run: |
+          if [ -z "$NUGET_USER" ]; then
+            echo "::error::Add the NUGET_USER secret (your nuget.org profile name) under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-dotnet@v4
@@ -35,8 +51,15 @@ jobs:
       - name: Pack
         run: dotnet pack src/Bhasini.Mcp -c Release -o artifacts
 
+      # Trusted Publishing: exchange GitHub's OIDC token for a NuGet API key valid for one hour.
+      - name: NuGet login (OIDC to temporary API key)
+        uses: NuGet/login@v1
+        id: nuget
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       - name: Push to NuGet.org
-        run: dotnet nuget push artifacts/*.nupkg -k "${{ secrets.NUGET_API_KEY }}" -s https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push artifacts/*.nupkg --api-key "${{ steps.nuget.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       # The registry reads the package README from NuGet to check the mcp-name marker, so wait for it.
       - name: Wait for the package on NuGet.org

@@ -107,6 +107,16 @@ test("rate limiting returns 429", async () => {
   assert.equal(res.headers.get("Retry-After"), "60");
 });
 
+test("serves the OpenAI domain token as plain text", async () => {
+  const env = { OPENAI_APPS_CHALLENGE: "TOKEN123" };
+  const res = await worker.fetch(new Request("https://mcp.bhasini.com/.well-known/openai-apps-challenge"), env);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("Content-Type") ?? "", /^text\/plain/);
+  assert.equal(await res.text(), "TOKEN123");
+  const missing = await worker.fetch(new Request("https://mcp.bhasini.com/.well-known/openai-apps-challenge"), {});
+  assert.equal(missing.status, 404);
+});
+
 test("other paths are 404", async () => {
   const res = await worker.fetch(new Request("https://mcp.bhasini.com/other"), {});
   assert.equal(res.status, 404);

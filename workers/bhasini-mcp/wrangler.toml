@@ -17,5 +17,10 @@ name = "RATE_LIMITER"
 namespace_id = "1001"
 simple = { limit = 120, period = 60 }
 
+# OpenAI plugin domain verification, served at /.well-known/openai-apps-challenge.
+# The token is meant to be public; replace it if OpenAI issues a new one.
+[vars]
+OPENAI_APPS_CHALLENGE = "DCusztdkOsrNne0CMqsrnDwZOFCgnrVv7OlCB2XTfrQ"
+
 [observability]
 enabled = true

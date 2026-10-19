@@ -6,6 +6,8 @@ import { errorResponse, handleMessage, PARSE_ERROR } from "./mcp.ts";
 export interface Env {
   // Workers Rate Limiting binding (wrangler.toml); absent in tests.
   RATE_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
+  // OpenAI plugin domain verification token (wrangler.toml [vars]); public by design.
+  OPENAI_APPS_CHALLENGE?: string;
 }
 
 const DOCS_URL = "https://bhasini.com/mcp/";
@@ -34,6 +36,14 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, "") || "/";
+
+    // OpenAI domain verification: exactly the token, as plain text, nothing else.
+    if (path === "/.well-known/openai-apps-challenge") {
+      if (!env.OPENAI_APPS_CHALLENGE || request.method !== "GET") return json({ error: "Not found" }, 404);
+      return new Response(env.OPENAI_APPS_CHALLENGE, {
+        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      });
+    }
 
     if (path === "/" || path === "/health") {
       if (path === "/health") return json({ status: "ok" });

@@ -11,3 +11,8 @@ TestResults/
 node_modules/
 .DS_Store
 Thumbs.db
+artifacts/
+# Generated from the C# engine by tools/Bhasini.FixtureGen (large; regenerated in CI)
+workers/bhasini-mcp/test/fixtures.json
+workers/bhasini-mcp/node_modules/
+workers/bhasini-mcp/.wrangler/

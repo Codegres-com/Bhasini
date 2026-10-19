@@ -1,0 +1,129 @@
+[
+  {
+    "name": "convert_script",
+    "title": "Convert between Indian scripts",
+    "description": "Rewrites text from one Indian script into another letter by letter, e.g. Devanagari 'नमस्ते' → Kannada 'ನಮಸ್ತೇ'. The language does not change, only the letters. Works between the Brahmic scripts (Devanagari, Bengali, Gurmukhi, Gujarati, Odia, Tamil, Telugu, Kannada, Malayalam) and Meetei Mayek; sounds the target script lacks use the nearest letter. Text in other scripts is kept as it is.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "Text in any Brahmic script or Meetei Mayek.",
+          "type": "string"
+        },
+        "targetLanguage": {
+          "description": "Language whose script to convert into, e.g. 'ta', 'Telugu', 'mni'.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "targetLanguage"
+      ]
+    },
+    "annotations": {
+      "title": "Convert between Indian scripts",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "get_keymap",
+    "title": "Get phonetic keyboard map",
+    "description": "Returns the phonetic keyboard map for a language: which Latin keys produce each letter. Useful for teaching someone to type a language or for building correct romanised input for transliterate.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "description": "Language code or name, e.g. 'ml', 'Odia'.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "language"
+      ]
+    },
+    "annotations": {
+      "title": "Get phonetic keyboard map",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "list_languages",
+    "title": "List Indian languages",
+    "description": "Lists the 22 scheduled languages of India (plus extra official scripts for Kashmiri, Manipuri and Sindhi) with the codes the other tools accept.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    },
+    "annotations": {
+      "title": "List Indian languages",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "native_digits",
+    "title": "Write digits in a native script",
+    "description": "Replaces ASCII digits 0-9 with a language's native digits, e.g. '2026' → '२०२६' (Hindi), '௨௦௨௬' (Tamil), '۲۰۲۶' (Urdu).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "Text containing digits.",
+          "type": "string"
+        },
+        "language": {
+          "description": "Language code or name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "language"
+      ]
+    },
+    "annotations": {
+      "title": "Write digits in a native script",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "transliterate",
+    "title": "Transliterate romanised text",
+    "description": "Writes romanised (Latin-letter) text in an Indian script by sound, e.g. 'namaste' → 'नमस्ते' for Hindi or 'vaNakkam' → 'வணக்கம்' for Tamil. This is transliteration, not translation: spell the words as they sound in the target language. Keys follow ITRANS/Baraha conventions: capitals for long vowels and retroflex consonants (A I U E O, T D N L Sh), M = anusvara, H = visarga. Use get_keymap for a language's exact keys.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "Romanised text to transliterate. Punctuation, digits and spaces are kept.",
+          "type": "string"
+        },
+        "language": {
+          "description": "Target language code or name, e.g. 'hi', 'ta', 'kn', 'Bengali', 'sat' (Santali, Ol Chiki).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "language"
+      ]
+    },
+    "annotations": {
+      "title": "Transliterate romanised text",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "bhasini": {
+      "command": "dnx",
+      "args": ["Bhasini.Mcp@0.1.0", "--yes"]
+    }
+  }
+}

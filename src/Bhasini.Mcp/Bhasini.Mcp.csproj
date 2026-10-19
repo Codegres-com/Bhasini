@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Bhasini.Mcp</RootNamespace>
+    <!-- Runs on whatever newer .NET the user has (dnx needs .NET 10). -->
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <!-- Published as a .NET tool and an MCP server package on NuGet: `dnx Bhasini.Mcp` or `dotnet tool install -g Bhasini.Mcp`. -->
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>bhasini-mcp</ToolCommandName>
+    <PackageId>Bhasini.Mcp</PackageId>
+    <PackageType>McpServer</PackageType>
+    <Version>0.1.0</Version>
+    <Authors>Codegres</Authors>
+    <Description>MCP server for Indian languages: transliterate romanised text into all 22 scheduled languages, convert between Indian scripts and look up keyboard layouts. Runs locally, no network calls.</Description>
+    <PackageTags>mcp;indic;transliteration;hindi;tamil;kannada;india;ai</PackageTags>
+    <PackageProjectUrl>https://bhasini.com</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Codegres-com/Bhasini</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include=".mcp/server.json" Pack="true" PackagePath="/.mcp/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="ModelContextProtocol" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bhasini.Core\Bhasini.Core.csproj" />
+  </ItemGroup>
+
+</Project>

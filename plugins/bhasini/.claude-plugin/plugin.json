@@ -1,0 +1,13 @@
+{
+  "name": "bhasini",
+  "version": "0.1.0",
+  "description": "Exact transliteration and script conversion for all 22 scheduled languages of India, from Hindi and Tamil to Santali (Ol Chiki) and Manipuri (Meetei Mayek). Runs locally, no network calls.",
+  "author": {
+    "name": "Codegres",
+    "url": "https://codegres.com"
+  },
+  "homepage": "https://bhasini.com/mcp/",
+  "repository": "https://github.com/Codegres-com/Bhasini",
+  "license": "MIT",
+  "keywords": ["indic", "india", "hindi", "tamil", "transliteration", "languages", "unicode"]
+}

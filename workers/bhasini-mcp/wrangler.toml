@@ -1,0 +1,21 @@
+# Bhasini remote MCP server. Deploy: npx wrangler deploy (after `npx wrangler login`).
+name = "bhasini-mcp"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+# Use the free workers.dev URL too (https://bhasini-mcp.<account>.workers.dev/mcp).
+workers_dev = true
+
+# mcp.bhasini.com as a Workers Custom Domain: Cloudflare creates the DNS record and certificate.
+# bhasini.com itself stays on GitHub Pages (DNS only), untouched.
+routes = [
+  { pattern = "mcp.bhasini.com", custom_domain = true }
+]
+
+# 120 requests per minute per client IP (Workers Rate Limiting binding).
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 120, period = 60 }
+
+[observability]
+enabled = true

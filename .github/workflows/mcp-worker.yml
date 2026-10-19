@@ -1,0 +1,81 @@
+name: MCP Worker
+
+# Tests the remote MCP server (workers/bhasini-mcp) against the C# engine, and deploys it to
+# Cloudflare from main when the CLOUDFLARE_API_TOKEN repository secret is set.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/Bhasini.Core/**'
+      - 'src/Bhasini.Mcp/**'
+      - 'tools/Bhasini.FixtureGen/**'
+      - 'workers/**'
+      - '.github/workflows/mcp-worker.yml'
+  pull_request:
+    paths:
+      - 'src/Bhasini.Core/**'
+      - 'src/Bhasini.Mcp/**'
+      - 'tools/Bhasini.FixtureGen/**'
+      - 'workers/**'
+      - '.github/workflows/mcp-worker.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: workers/bhasini-mcp
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: workers/bhasini-mcp/package-lock.json
+
+      # Tool definitions and Unicode data come from the C# server; fail if the committed copies are stale.
+      - name: Export fixtures from C#
+        run: npm run fixtures
+
+      - name: Generated files are up to date
+        run: git diff --exit-code -- src/generated
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: workers/bhasini-mcp/package-lock.json
+
+      - run: npm ci
+
+      - name: Deploy to Cloudflare
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: npx wrangler deploy
+
+      - name: Skip deploy (no CLOUDFLARE_API_TOKEN secret)
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "Set the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets to deploy automatically."

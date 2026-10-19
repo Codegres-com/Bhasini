@@ -24,6 +24,10 @@
   <h2>Global mode (Windows app)</h2>
   <p>When you turn on Global mode (F9), Bhasini reads your keystrokes system-wide only to convert them into the Indian language you chose and type the result into the active window. Keystrokes are handled in memory on your computer, are not stored or logged, and are not transmitted. Global mode stays off until you turn it on, and you can turn it off at any time with F9 or from the tray icon.</p>
 
+  <h2>MCP server (Bhasini.Mcp)</h2>
+  <p>The Bhasini MCP server runs on your own computer. Text that your AI assistant sends to its tools is processed in memory and discarded when the call returns. It is not stored, logged or transmitted, and the server makes no network requests. Your AI assistant (for example Claude or ChatGPT) handles the conversation under its own privacy policy.</p>
+  <p>The hosted MCP server at mcp.bhasini.com runs on Cloudflare Workers. Text sent to its tools is processed in memory and is not stored or logged. Cloudflare handles the connection, including your IP address, which is used only to rate-limit requests (120 per minute). Request metadata such as time and status may appear in Cloudflare's operational logs under Cloudflare's privacy policy.</p>
+
   <h2>Data stored on your device</h2>
   <p>Your preferences (language, keyboard, display options) are saved locally on your device so Bhasini remembers them. Documents are saved only where you choose.</p>
 

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Bhasini.FixtureGen</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bhasini.Core\Bhasini.Core.csproj" />
+    <ProjectReference Include="..\..\src\Bhasini.Mcp\Bhasini.Mcp.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -364,7 +364,8 @@ namespace Bhasini.SiteGen
             {
                 b.Append($"<li><a href=\"{p.Path}\">{H(p.Language!.Name)} voice typing</a></li>");
             }
-            b.Append("<li><a href=\"/indian-script-converter/\">Indian script converter</a></li></ul>");
+            b.Append("<li><a href=\"/indian-script-converter/\">Indian script converter</a></li>");
+            b.Append("<li><a href=\"/mcp/\">MCP server for AI assistants<small>Claude, ChatGPT Codex, Cursor</small></a></li></ul>");
 
             b.Append(Faq(new List<(string, string)>
             {
@@ -539,6 +540,7 @@ namespace Bhasini.SiteGen
                     _ => "0.7",
                 });
             }
+            Url("/mcp/", "monthly", "0.6");
             Url("/privacy.html", "yearly", "0.3");
             return b.Append("</urlset>\n").ToString();
         }

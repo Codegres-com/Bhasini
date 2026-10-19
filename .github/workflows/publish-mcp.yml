@@ -1,0 +1,56 @@
+name: Publish MCP server
+
+# Push a tag like mcp-v0.1.0 to publish Bhasini.Mcp to NuGet.org and the Official MCP Registry.
+# Needs the NUGET_API_KEY repository secret. The version in the tag must match <Version> in
+# src/Bhasini.Mcp/Bhasini.Mcp.csproj and both versions in src/Bhasini.Mcp/.mcp/server.json.
+on:
+  push:
+    tags: ['mcp-v*']
+
+permissions:
+  contents: read
+  id-token: write # GitHub OIDC login to the MCP Registry
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Check versions match the tag
+        run: |
+          version="${GITHUB_REF_NAME#mcp-v}"
+          grep -q "<Version>$version</Version>" src/Bhasini.Mcp/Bhasini.Mcp.csproj
+          test "$(jq -r .version src/Bhasini.Mcp/.mcp/server.json)" = "$version"
+          test "$(jq -r '.packages[0].version' src/Bhasini.Mcp/.mcp/server.json)" = "$version"
+          grep -q "Bhasini.Mcp@$version" plugins/bhasini/.mcp.json
+
+      - name: Test
+        run: dotnet test tests/Bhasini.Core.Tests -c Release
+
+      - name: Pack
+        run: dotnet pack src/Bhasini.Mcp -c Release -o artifacts
+
+      - name: Push to NuGet.org
+        run: dotnet nuget push artifacts/*.nupkg -k "${{ secrets.NUGET_API_KEY }}" -s https://api.nuget.org/v3/index.json --skip-duplicate
+
+      # The registry reads the package README from NuGet to check the mcp-name marker, so wait for it.
+      - name: Wait for the package on NuGet.org
+        run: |
+          version="${GITHUB_REF_NAME#mcp-v}"
+          url="https://api.nuget.org/v3-flatcontainer/bhasini.mcp/$version/readme"
+          for i in $(seq 1 60); do
+            curl -sf "$url" > /dev/null && exit 0
+            sleep 15
+          done
+          echo "Package README not available after 15 minutes: $url"; exit 1
+
+      - name: Publish to the MCP Registry
+        run: |
+          curl -sL https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish src/Bhasini.Mcp/.mcp/server.json

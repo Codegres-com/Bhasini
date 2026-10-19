@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bhasini MCP Server — Indian Languages for Claude, ChatGPT &amp; AI Agents</title>
+<meta name="description" content="Free MCP server for all 22 Indian languages: exact transliteration, script conversion, keyboard maps and native digits for Claude, ChatGPT, Codex, Cursor and VS Code. Hosted at mcp.bhasini.com or run locally." />
+<link rel="icon" type="image/svg+xml" href="/bhasini-logo.svg" />
+<link rel="canonical" href="https://bhasini.com/mcp/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Bhasini MCP Server — Indian Languages for AI Agents" />
+<meta property="og:description" content="Exact transliteration and script conversion for all 22 Indian languages, as an MCP server for Claude, ChatGPT Codex, Cursor and VS Code." />
+<meta property="og:url" content="https://bhasini.com/mcp/" />
+<meta property="og:image" content="https://bhasini.com/og-image.jpg" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Bhasini MCP Server",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "url": "https://bhasini.com/mcp/",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+  "creator": { "@type": "Organization", "name": "Codegres", "url": "https://codegres.com" }
+}
+</script>
+<style>
+  body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f1ea; color: #222; line-height: 1.65; }
+  main { max-width: 820px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { color: #1f2a5c; margin-bottom: .2em; } h2 { color: #1f2a5c; margin-top: 2em; font-size: 1.2rem; }
+  a { color: #2d3a8c; }
+  .lead { font-size: 1.1rem; color: #4a5488; }
+  pre { background: #1f2a5c; color: #f4f1ea; padding: 14px 16px; border-radius: 8px; overflow-x: auto; font-size: .9rem; line-height: 1.5; }
+  code { font-family: Consolas, 'Cascadia Mono', monospace; }
+  p code, li code, td code { background: #e9e4d8; padding: .1em .35em; border-radius: 4px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: .55rem .8rem; border-bottom: 1px solid #e3ded2; vertical-align: top; }
+  th { background: #faf8f3; font-size: .85rem; color: #6b6f80; }
+  .native { font-size: 1.15em; }
+</style>
+</head>
+<body>
+<main>
+  <p><a href="/">← Bhasini</a></p>
+  <h1>Bhasini MCP Server</h1>
+  <p class="lead">Give your AI assistant exact spelling in all 22 scheduled languages of India. Bhasini's
+  <a href="https://modelcontextprotocol.io">MCP</a> server transliterates romanised text, converts between
+  Indian scripts, and looks up keyboard maps with the same engine as this website. Connect to the hosted
+  server with one URL, or run it on your own computer.</p>
+
+  <h2>Tools</h2>
+  <table>
+    <thead><tr><th>Tool</th><th>What it does</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>transliterate</code></td><td>Romanised text to native script, by sound</td><td><code>vaNakkam</code> + <code>ta</code> → <span class="native">வணக்கம்</span></td></tr>
+      <tr><td><code>convert_script</code></td><td>One Indian script to another</td><td><span class="native">नमस्ते</span> + <code>kn</code> → <span class="native">ನಮಸ್ತೇ</span></td></tr>
+      <tr><td><code>get_keymap</code></td><td>Phonetic keyboard map for a language</td><td>Keys for every letter of Meetei Mayek</td></tr>
+      <tr><td><code>native_digits</code></td><td>Digits in native numerals</td><td><code>2026</code> + <code>hi</code> → <span class="native">२०२६</span></td></tr>
+      <tr><td><code>list_languages</code></td><td>Supported languages and codes</td><td><code>hi</code>, <code>ta</code>, <code>sat</code>, <code>mni</code>, <code>ks</code>, …</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Connect (nothing to install)</h2>
+  <p>Server URL: <code>https://mcp.bhasini.com/mcp</code>. No account or API key needed.</p>
+
+  <h3>Claude (claude.ai and Claude Desktop)</h3>
+  <p>Settings → Connectors → <strong>Add custom connector</strong>, then paste the URL above.</p>
+
+  <h3>Claude Code</h3>
+  <pre><code>claude mcp add --transport http bhasini https://mcp.bhasini.com/mcp</code></pre>
+
+  <h3>ChatGPT</h3>
+  <p>Turn on developer mode in ChatGPT's settings, then add a custom app with the URL above.</p>
+
+  <h3>OpenAI Codex <small>(~/.codex/config.toml)</small></h3>
+  <pre><code>[mcp_servers.bhasini]
+url = "https://mcp.bhasini.com/mcp"</code></pre>
+
+  <h3>VS Code <small>(.vscode/mcp.json)</small></h3>
+  <pre><code>{
+  "servers": {
+    "bhasini": { "type": "http", "url": "https://mcp.bhasini.com/mcp" }
+  }
+}</code></pre>
+
+  <h3>Cursor and other JSON configs</h3>
+  <pre><code>{
+  "mcpServers": {
+    "bhasini": { "url": "https://mcp.bhasini.com/mcp" }
+  }
+}</code></pre>
+
+  <h2>Or run it locally (offline)</h2>
+  <p>You need the <a href="https://dotnet.microsoft.com/download">.NET SDK</a>. The <code>dnx</code> command comes with .NET 10 or later.</p>
+
+  <h3>Claude Code</h3>
+  <pre><code>claude mcp add bhasini -- dnx Bhasini.Mcp@0.1.0 --yes</code></pre>
+
+  <h3>Claude Desktop, Cursor, Windsurf and other JSON configs</h3>
+  <pre><code>{
+  "mcpServers": {
+    "bhasini": {
+      "command": "dnx",
+      "args": ["Bhasini.Mcp@0.1.0", "--yes"]
+    }
+  }
+}</code></pre>
+
+  <h3>OpenAI Codex CLI <small>(~/.codex/config.toml)</small></h3>
+  <pre><code>[mcp_servers.bhasini]
+command = "dnx"
+args = ["Bhasini.Mcp@0.1.0", "--yes"]</code></pre>
+
+  <h3>VS Code <small>(.vscode/mcp.json)</small></h3>
+  <pre><code>{
+  "servers": {
+    "bhasini": { "type": "stdio", "command": "dnx", "args": ["Bhasini.Mcp@0.1.0", "--yes"] }
+  }
+}</code></pre>
+
+  <h3>With .NET 8 or 9</h3>
+  <pre><code>dotnet tool install -g Bhasini.Mcp</code></pre>
+  <p>Then use <code>bhasini-mcp</code> as the command, with no arguments.</p>
+
+  <h2>Try asking</h2>
+  <ul>
+    <li>"Write 'Happy Diwali, from the Sharma family' in Hindi, Tamil and Bengali scripts."</li>
+    <li>"Convert this Hindi paragraph into Kannada script so my grandmother can read it."</li>
+    <li>"How do I type ழ on a Tamil phonetic keyboard?"</li>
+    <li>"Write the Santali greeting johar in Ol Chiki."</li>
+  </ul>
+
+  <h2>Privacy</h2>
+  <p><strong>Local server:</strong> collects nothing, stores nothing and sends nothing. Text is processed in
+  memory on your computer and discarded when each call returns.</p>
+  <p><strong>Hosted server (mcp.bhasini.com):</strong> runs on Cloudflare Workers. The text in each tool call
+  is processed in memory and is not stored or logged. Cloudflare handles the connection, including your IP
+  address, which is used only to limit each client to 120 requests a minute. Request metadata such as time
+  and status may appear in Cloudflare's operational logs.</p>
+  <p>Your AI assistant handles the conversation under its own privacy policy. See the
+  <a href="/privacy.html">privacy policy</a>.</p>
+
+  <h2>Source</h2>
+  <p>Open source under the MIT license: <a href="https://github.com/Codegres-com/Bhasini">github.com/Codegres-com/Bhasini</a>.
+  Questions: <a href="mailto:contact@codegres.com">contact@codegres.com</a>.</p>
+</main>
+</body>
+</html>

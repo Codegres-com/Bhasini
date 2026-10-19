@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.codegres-com/bhasini",
+  "version": "0.1.0",
+  "description": "Indic MCP: transliterate into all 22 Indian languages, convert scripts, keymaps. Local.",
+  "title": "Bhasini Indic Languages",
+  "websiteUrl": "https://bhasini.com/mcp/",
+  "packages": [
+    {
+      "registryType": "nuget",
+      "registryBaseUrl": "https://api.nuget.org",
+      "identifier": "Bhasini.Mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [],
+      "environmentVariables": []
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/Codegres-com/Bhasini",
+    "source": "github"
+  }
+}

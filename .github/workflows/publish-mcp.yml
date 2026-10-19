@@ -2,7 +2,7 @@ name: Publish MCP server
 
 # Push a tag like mcp-v0.1.0 to publish Bhasini.Mcp to NuGet.org and the Official MCP Registry.
 # The version in the tag must match <Version> in src/Bhasini.Mcp/Bhasini.Mcp.csproj, both versions
-# in src/Bhasini.Mcp/.mcp/server.json and the pin in plugins/bhasini/.mcp.json.
+# in src/Bhasini.Mcp/.mcp/server.json.
 #
 # No long-lived keys: NuGet uses Trusted Publishing (policy on nuget.org: owner Codegres-com,
 # repository Bhasini, workflow publish-mcp.yml, environment main) and the MCP Registry uses GitHub
@@ -43,7 +43,6 @@ jobs:
           grep -q "<Version>$version</Version>" src/Bhasini.Mcp/Bhasini.Mcp.csproj
           test "$(jq -r .version src/Bhasini.Mcp/.mcp/server.json)" = "$version"
           test "$(jq -r '.packages[0].version' src/Bhasini.Mcp/.mcp/server.json)" = "$version"
-          grep -q "Bhasini.Mcp@$version" plugins/bhasini/.mcp.json
 
       - name: Test
         run: dotnet test tests/Bhasini.Core.Tests -c Release

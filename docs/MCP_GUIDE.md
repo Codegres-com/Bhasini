@@ -9,7 +9,7 @@ Status: **local server, package, plugin, docs page and remote (Cloudflare Worker
 | MCP server | `src/Bhasini.Mcp/` | C# stdio server on the [MCP C# SDK](https://www.nuget.org/packages/ModelContextProtocol) 2.2.0, reusing `Bhasini.Core`. Five read-only tools: `list_languages`, `transliterate`, `convert_script`, `get_keymap`, `native_digits` |
 | NuGet / .NET tool package | `dotnet pack src/Bhasini.Mcp` | `Bhasini.Mcp` 0.1.0, package type `McpServer`, command `bhasini-mcp`, includes `README.md` (with the `mcp-name` marker and Privacy Policy) and `.mcp/server.json` |
 | Registry manifest | `src/Bhasini.Mcp/.mcp/server.json` | Official MCP Registry entry `io.github.Codegres-com/bhasini` |
-| Claude plugin | `plugins/bhasini/` | Plugin manifest + `.mcp.json` (`dnx Bhasini.Mcp@0.1.0 --yes`) + `indic-text` skill + README + LICENSE. Passes `claude plugin validate` |
+| Claude plugin | `plugins/bhasini/` | Plugin manifest + icon + `.mcp.json` (the hosted server, `https://mcp.bhasini.com/mcp`) + `indic-text` skill + README + LICENSE. Works on claude.ai, Cowork and Claude Code with nothing to install. Passes `claude plugin validate` and the portal's validation |
 | Static docs page | `src/Bhasini.Web/wwwroot/mcp/index.html` → **https://bhasini.com/mcp/** | Install instructions for every client. In the sitemap and linked from the home page |
 | Release workflow | `.github/workflows/publish-mcp.yml` | On tag `mcp-vX.Y.Z`: test → pack → push to NuGet → publish to the MCP Registry |
 | **Remote MCP server** | `workers/bhasini-mcp/` → **https://mcp.bhasini.com/mcp** | Cloudflare Worker, Streamable HTTP, no auth, CORS, 64 KB request cap, 120 requests/min per IP. TypeScript port of `Bhasini.Core`; tool definitions are exported from the C# server so both list identical tools |
@@ -68,9 +68,9 @@ No API keys are stored. NuGet uses **Trusted Publishing** and the MCP Registry u
    The capital C matters: the registry matches the GitHub owner name exactly. The registry feeds the GitHub
    MCP Registry, VS Code's MCP gallery and other catalogs.
 
-When you bump the version, update `<Version>` in the csproj, both versions in `server.json`, the
-pinned version in `plugins/bhasini/.mcp.json`, and `version` in `plugin.json`. The workflow checks
-the first four.
+When you bump the version, update `<Version>` in the csproj and both versions in `server.json`. The
+workflow checks all three against the tag. The plugin (`plugins/bhasini/.claude-plugin/plugin.json`)
+has its own `version`; raise it whenever the plugin itself changes.
 
 ---
 
@@ -81,7 +81,7 @@ the first four.
 2. Connect your GitHub account on claude.ai (it must have push access to `Codegres-com/Bhasini`).
 3. **Submit new → Plugin bundle**. Repository: `Codegres-com/Bhasini`, plugin path: `plugins/bhasini`, branch: `main`.
 4. **Validate**, fix any blocking findings, answer **Data handling** (no personal data, no data sent elsewhere, no retention), complete **Compliance**, then **Submit for review**.
-5. Expect a **reviewer hold**: any plugin that starts a package from a registry (our `dnx Bhasini.Mcp@0.1.0`) is always checked by a person. That's normal, not a rejection.
+5. The plugin uses the hosted server, so it runs nothing on the user's machine and installs no package. That avoids the reviewer hold that package launchers such as `dnx` or `npx` always get. The icon is `.claude-plugin/icon.png`; the portal takes it only the first time the plugin is saved, so don't save a draft before it's pushed.
 6. Once it passes, select **Publish**. People then add it from claude.ai and use it in chat, Cowork and Claude Code.
 
 Tips:

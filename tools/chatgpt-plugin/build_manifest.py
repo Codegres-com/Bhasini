@@ -178,6 +178,23 @@ def check(manifest, root):
     for rel in (ui["logo"], ui["composerIcon"], openai["onboardingSkill"], "./mcp.json"):
         if not os.path.isfile(os.path.join(root, rel)):
             problems.append(f"missing file {rel}")
+
+    # The portal only discovers mcp.json with the Agent Plugins $schema, and plugin-level test cases
+    # need exactly one server; otherwise it reports "require exactly one MCP server".
+    mcp_path = os.path.join(root, "mcp.json")
+    if os.path.isfile(mcp_path):
+        with open(mcp_path, encoding="utf-8") as f:
+            mcp = json.load(f)
+        if mcp.get("$schema") != "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json":
+            problems.append("mcp.json needs \"$schema\": \"https://agent-plugins.org/schemas/1.0.0/mcp.schema.json\"")
+        servers = mcp.get("mcpServers", {})
+        if len(servers) != 1:
+            problems.append(f"mcp.json must declare exactly one server for plugin-level test cases (found {len(servers)})")
+        for name, server in servers.items():
+            if server.get("type") != "streamable-http" or not str(server.get("url", "")).startswith("https://"):
+                problems.append(f"mcp.json server {name} must be type streamable-http with an https url")
+            if server.get("headers"):
+                problems.append(f"mcp.json server {name} must not set headers for public submission")
     return problems
 
 

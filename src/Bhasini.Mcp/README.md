@@ -22,6 +22,9 @@ deterministic answer instead of a guess.
 
 All tools are read-only and work offline.
 
+**Prefer nothing to install?** The same tools are hosted at `https://mcp.bhasini.com/mcp` and listed in
+[Claude's connector directory](https://claude.ai/directory/bhasini).
+
 ## Install
 
 Requires the .NET SDK. `dnx` comes with .NET 10 or later; `dotnet tool` works with .NET 8 or later.

@@ -89,7 +89,11 @@ Tips:
 - The name "bhasini" may be held as **"Name matches a known brand"** because of the government's BHASHINI. Be ready to explain the difference, or rename it (e.g. `bhasini-indic`).
 - Optionally move the plugin to its own repository root. Subfolder plugins get stricter script checks.
 
-### Route B: MCP connector (remote server, after deploying it)
+### Route B: MCP connector: done, live at https://claude.ai/directory/bhasini
+
+Published as a Community connector (slug `bhasini`, Oct 2026); it shows signed out too. Edit the listing
+from the portal. The slug is permanent.
+
 Same portal, **Submit new → MCP connector**, paste the `https://` URL. It requires a `title` and
 `readOnlyHint`/`destructiveHint` on every tool (already done), a privacy policy URL
 (`https://bhasini.com/privacy.html`), a docs URL (`https://bhasini.com/mcp/`), a support contact and an
@@ -162,7 +166,7 @@ tool definitions weren't regenerated.
 ### Connect to the remote server
 | Client | How |
 |---|---|
-| claude.ai / Claude Desktop | Settings → Connectors → **Add custom connector** → `https://mcp.bhasini.com/mcp` |
+| claude.ai / Claude Desktop | From the directory: https://claude.ai/directory/bhasini (or Settings → Connectors → **Add custom connector** → `https://mcp.bhasini.com/mcp`) |
 | Claude Code | `claude mcp add --transport http bhasini https://mcp.bhasini.com/mcp` |
 | ChatGPT | Turn on developer mode in ChatGPT's settings, then add a custom app/connector with the URL (until it's listed in the directory) |
 | OpenAI Codex (`~/.codex/config.toml`) | `[mcp_servers.bhasini]` with `url = "https://mcp.bhasini.com/mcp"` |

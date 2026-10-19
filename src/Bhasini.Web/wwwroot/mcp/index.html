@@ -32,6 +32,8 @@
   .lead { font-size: 1.1rem; color: #4a5488; }
   pre { background: #1f2a5c; color: #f4f1ea; padding: 14px 16px; border-radius: 8px; overflow-x: auto; font-size: .9rem; line-height: 1.5; }
   code { font-family: Consolas, 'Cascadia Mono', monospace; }
+  .directory-link { display: inline-block; padding: .55rem 1rem; border-radius: 8px; background: #f07b2b; color: #fff; font-weight: 600; text-decoration: none; }
+  .directory-link:hover { background: #e2531f; }
   p code, li code, td code { background: #e9e4d8; padding: .1em .35em; border-radius: 4px; }
   table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
   th, td { text-align: left; padding: .55rem .8rem; border-bottom: 1px solid #e3ded2; vertical-align: top; }
@@ -64,7 +66,8 @@
   <p>Server URL: <code>https://mcp.bhasini.com/mcp</code>. No account or API key needed.</p>
 
   <h3>Claude (claude.ai and Claude Desktop)</h3>
-  <p>Settings → Connectors → <strong>Add custom connector</strong>, then paste the URL above.</p>
+  <p><a class="directory-link" href="https://claude.ai/directory/bhasini" target="_blank" rel="noopener">Add Bhasini from Claude's directory →</a></p>
+  <p>Or add it by hand: Settings → Connectors → <strong>Add custom connector</strong>, then paste the URL above.</p>
 
   <h3>Claude Code</h3>
   <pre><code>claude mcp add --transport http bhasini https://mcp.bhasini.com/mcp</code></pre>

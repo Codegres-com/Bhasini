@@ -9,40 +9,164 @@
 <style>
   body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f1ea; color: #222; line-height: 1.65; }
   main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
-  h1 { color: #1f2a5c; } h2 { color: #1f2a5c; margin-top: 2em; font-size: 1.2rem; }
+  h1 { color: #1f2a5c; } h2 { color: #1f2a5c; margin-top: 2em; font-size: 1.2rem; } h3 { font-size: 1rem; margin-top: 1.5em; }
   a { color: #2d3a8c; }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+  th, td { border: 1px solid #d6d0c2; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #ebe5d8; }
+  nav ul { columns: 2; padding-left: 1.2em; }
+  @media (max-width: 560px) { nav ul { columns: 1; } }
 </style>
 </head>
 <body>
 <main>
   <h1>Privacy Policy</h1>
-  <p>Last updated: 18 October 2026. Applies to the Bhasini website (bhasini.com) and the Bhasini app for Windows, published by Codegres.</p>
-
-  <h2>What we collect</h2>
-  <p>Nothing. Bhasini has no accounts, analytics, advertising or tracking. Everything you type is processed on your own device and is never sent to us or anyone else.</p>
-
-  <h2>Global mode (Windows app)</h2>
-  <p>When you turn on Global mode (F9), Bhasini reads your keystrokes system-wide only to convert them into the Indian language you chose and type the result into the active window. Keystrokes are handled in memory on your computer, are not stored or logged, and are not transmitted. Global mode stays off until you turn it on, and you can turn it off at any time with F9 or from the tray icon.</p>
-
-  <h2>MCP server (Bhasini.Mcp)</h2>
-  <p>The Bhasini MCP server runs on your own computer. Text that your AI assistant sends to its tools is processed in memory and discarded when the call returns. It is not stored, logged or transmitted, and the server makes no network requests. Your AI assistant (for example Claude or ChatGPT) handles the conversation under its own privacy policy.</p>
-  <p>The hosted MCP server at mcp.bhasini.com runs on Cloudflare Workers. Text sent to its tools is processed in memory and is not stored or logged. Cloudflare handles the connection, including your IP address, which is used only to rate-limit requests (120 per minute). Request metadata such as time and status may appear in Cloudflare's operational logs under Cloudflare's privacy policy.</p>
-
-  <h2>Data stored on your device</h2>
-  <p>Your preferences (language, keyboard, display options) are saved locally on your device so Bhasini remembers them. Documents are saved only where you choose.</p>
-
-  <h2>Third-party services</h2>
+  <p>Last updated: 21 October 2026.</p>
+  <p>This policy explains what data Bhasini collects, why, who receives it, how long it is kept and what
+  you can do about it. It covers every part of Bhasini published by Codegres ("we", "us"):</p>
   <ul>
-    <li><strong>Fonts:</strong> the website may load Noto fonts from Google Fonts, which receives standard web request information (such as your IP address).</li>
-    <li><strong>Voice typing (website only):</strong> if you use the Speak button, your browser's speech recognition service (for example Google in Chrome or Microsoft in Edge) processes the audio under that provider's privacy policy.</li>
-    <li><strong>Sponsorship:</strong> payments made through Razorpay are handled by Razorpay under its own privacy policy.</li>
+    <li>the hosted MCP server at <strong>mcp.bhasini.com</strong>, which powers the Bhasini plugin in ChatGPT and the Bhasini connector in Claude;</li>
+    <li>the local MCP server (the <code>Bhasini.Mcp</code> package that runs on your own computer);</li>
+    <li>the website at <strong>bhasini.com</strong>;</li>
+    <li>the Bhasini app for Windows.</li>
   </ul>
 
-  <h2>Children</h2>
-  <p>Bhasini does not collect personal information from anyone, including children.</p>
+  <nav>
+    <ul>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#hosted">Hosted MCP server and ChatGPT plugin</a></li>
+      <li><a href="#local">Local MCP server</a></li>
+      <li><a href="#website">Website</a></li>
+      <li><a href="#windows">Windows app</a></li>
+      <li><a href="#recipients">Who receives data</a></li>
+      <li><a href="#retention">Retention</a></li>
+      <li><a href="#controls">Your choices and rights</a></li>
+      <li><a href="#security">Security and transfers</a></li>
+      <li><a href="#children">Children</a></li>
+      <li><a href="#changes">Changes and contact</a></li>
+    </ul>
+  </nav>
 
-  <h2>Contact</h2>
-  <p>Questions: <a href="mailto:naveen@codegres.com">naveen@codegres.com</a> · <a href="https://codegres.com">codegres.com</a></p>
+  <h2 id="summary">Summary</h2>
+  <ul>
+    <li>Bhasini has no accounts, sign-in, analytics, advertising or tracking cookies.</li>
+    <li>Text sent to Bhasini's tools is converted in memory and discarded when the request ends. We do not store it, log it, read it, sell it, share it or use it to train any model.</li>
+    <li>The hosted server sees your IP address and basic request details. These are used only to rate-limit and to keep the service running, and are deleted within 7 days.</li>
+    <li>We do not sell personal data or use it for advertising or profiling.</li>
+  </ul>
+
+  <h2 id="hosted">Hosted MCP server and ChatGPT plugin (mcp.bhasini.com)</h2>
+  <p>When you use the Bhasini plugin in ChatGPT (or the Bhasini connector in Claude or another AI assistant),
+  the assistant decides when to call a Bhasini tool and sends that request to mcp.bhasini.com. Bhasini
+  never sees your conversation, chat history, files, name, email address or ChatGPT account. It receives
+  only the values the assistant puts into a tool call.</p>
+
+  <h3>Tool inputs and outputs</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Tool</th><th>Input we receive</th><th>Output we return</th></tr>
+    <tr><td><code>transliterate</code></td><td>Romanised text and a language code (for example <code>ta</code>)</td><td>The same text written in that language's script</td></tr>
+    <tr><td><code>convert_script</code></td><td>Text in an Indian script and a target language code</td><td>The same text written in the target script</td></tr>
+    <tr><td><code>native_digits</code></td><td>Text containing digits and a language code</td><td>The text with digits in that language's numerals</td></tr>
+    <tr><td><code>get_keymap</code></td><td>A language code</td><td>The phonetic keyboard map for that language</td></tr>
+    <tr><td><code>list_languages</code></td><td>Nothing</td><td>The list of supported languages, scripts and codes</td></tr>
+  </table>
+  </div>
+  <p>Tool input text is whatever the assistant sends, so it could contain personal information if you ask
+  for, say, your name or address to be written in another script. However, it is handled the same way as
+  any other text: it is converted in memory, the result is returned in the response, and both are discarded. Neither the
+  input nor the output is written to disk, a database or a log. All tools are read-only. They do not
+  contact any other service and keep no state between calls.</p>
+  <p>An assistant may add metadata to a tool call, such as your locale or approximate location. Bhasini
+  ignores this metadata and does not store it.</p>
+
+  <h3>Connection data</h3>
+  <p>Like any web service, the hosted server receives connection data with every request: your IP address
+  (in ChatGPT this is usually an OpenAI server address rather than your own), the time, the URL path, the
+  HTTP method, the response status and size, and standard headers such as the user agent. This connection data is used only to:</p>
+  <ul>
+    <li><strong>Rate-limit requests:</strong> the IP address is used as a counter key to allow 120 requests a minute per client. The counter expires after 60 seconds.</li>
+    <li><strong>Operate and secure the service:</strong> Cloudflare Workers operational logs record request metadata (time, path, method, status, duration, errors and the request headers listed above). We use them only to find faults and abuse. They never contain tool input or output text.</li>
+  </ul>
+
+  <h2 id="local">Local MCP server (Bhasini.Mcp)</h2>
+  <p>The local server runs on your own computer. Text that your AI assistant sends to it is processed in
+  memory and discarded when the call returns. It collects nothing, stores nothing and makes no network
+  requests, so we receive no data from it at all.</p>
+
+  <h2 id="website">Website (bhasini.com)</h2>
+  <p>The editor runs entirely in your browser. Text you type, convert or open is processed on your device and
+  is not sent to us. Documents are saved only where you choose to save them.</p>
+  <ul>
+    <li><strong>Preferences:</strong> your language, keyboard and display options are saved in your browser's local storage so Bhasini remembers them. They stay on your device.</li>
+    <li><strong>Hosting:</strong> the site is served by GitHub Pages, which receives standard web request data (such as your IP address and user agent) and may log it for security under GitHub's privacy statement.</li>
+    <li><strong>Fonts:</strong> the site may load Noto fonts from Google Fonts, which receives standard web request data (such as your IP address).</li>
+    <li><strong>Voice typing:</strong> if you press the Speak button, your browser sends your audio to its own speech recognition service (for example Google in Chrome or Microsoft in Edge). We do not receive the audio.</li>
+    <li><strong>Sponsorship:</strong> if you choose to sponsor Bhasini, Razorpay processes your payment. Razorpay shares a record of the payment with us (amount, date, transaction reference and the contact details you entered, such as name, email or phone). We use this record only to confirm the payment, to reply to you and to meet accounting and tax obligations. We never receive your card or bank details.</li>
+  </ul>
+
+  <h2 id="windows">Windows app</h2>
+  <p>The app works offline and sends nothing to us. Your preferences are saved locally on your computer.</p>
+  <p>When you turn on Global mode (F9), Bhasini reads your keystrokes system-wide only to convert them into the
+  Indian language you chose and type the result into the active window. Keystrokes are handled in memory,
+  are not stored or logged, and are not transmitted. Global mode stays off until you turn it on, and you can
+  turn it off at any time with F9 or from the tray icon.</p>
+
+  <h2 id="recipients">Who receives data</h2>
+  <p>We do not sell, rent or share personal data with anyone for their own purposes. These service providers
+  process data on our behalf, or directly when you use their feature:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Recipient</th><th>Data</th><th>Purpose</th></tr>
+    <tr><td>Cloudflare, Inc.</td><td>Connection data for mcp.bhasini.com (IP address, request metadata). Tool text passes through its servers in memory only.</td><td>Hosting the MCP server, rate limiting, operational logs, security</td></tr>
+    <tr><td>GitHub, Inc.</td><td>Web request data for bhasini.com</td><td>Hosting the website</td></tr>
+    <tr><td>Google LLC</td><td>Web request data when fonts load</td><td>Serving fonts</td></tr>
+    <tr><td>Your browser's speech provider</td><td>Audio, only when you use voice typing</td><td>Speech recognition</td></tr>
+    <tr><td>Razorpay Software Pvt. Ltd.</td><td>Payment details, only when you sponsor</td><td>Processing payments</td></tr>
+  </table>
+  </div>
+  <p>Your AI assistant (for example ChatGPT by OpenAI, or Claude by Anthropic) handles your conversation under
+  its own privacy policy. We may also disclose data if the law requires it. The only data we would have to
+  disclose is connection data and payment records, because we hold no tool text.</p>
+
+  <h2 id="retention">Retention</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Data</th><th>How long it is kept</th></tr>
+    <tr><td>Tool input and output text (hosted and local servers)</td><td>Not kept. Discarded when the request ends.</td></tr>
+    <tr><td>IP address in the rate-limit counter</td><td>60 seconds</td></tr>
+    <tr><td>Cloudflare Workers operational logs</td><td>Deleted automatically within 7 days</td></tr>
+    <tr><td>Website and app preferences</td><td>On your device until you clear them</td></tr>
+    <tr><td>Sponsorship payment records</td><td>As long as Indian accounting and tax law requires (currently up to 8 years)</td></tr>
+  </table>
+  </div>
+  <p>Cloudflare, GitHub, Google, your speech provider and Razorpay may keep their own records for longer under their own policies.</p>
+
+  <h2 id="controls">Your choices and rights</h2>
+  <ul>
+    <li><strong>Stop using the plugin:</strong> disconnect or remove Bhasini in ChatGPT's settings (Apps or Plugins) at any time. ChatGPT then stops sending requests to Bhasini.</li>
+    <li><strong>Control what is sent:</strong> Bhasini receives only what you ask your assistant to convert. Don't ask it to convert text you don't want sent.</li>
+    <li><strong>Avoid the hosted server:</strong> install the local MCP server, which sends nothing over the internet.</li>
+    <li><strong>Clear local data:</strong> clear your browser's site data for bhasini.com, or uninstall the Windows app, to remove your saved preferences.</li>
+    <li><strong>Access, correction and deletion:</strong> email us to ask what data we hold about you, or to ask us to correct or delete it.
+      Because we keep no tool text and logs expire within 7 days, in practice this applies mostly to sponsorship records. We reply within 30 days.
+      You may also have rights under laws such as India's Digital Personal Data Protection Act 2023 or the EU GDPR, including the right to complain to a data protection authority.</li>
+  </ul>
+
+  <h2 id="security">Security and international transfers</h2>
+  <p>All connections to mcp.bhasini.com and bhasini.com use HTTPS. Requests are size-limited and rate-limited.
+  Cloudflare and GitHub run on global networks, so connection data may be processed in countries other than
+  your own, including the United States and India.</p>
+
+  <h2 id="children">Children</h2>
+  <p>Bhasini is not directed at children under 13 and does not knowingly collect personal information from
+  them. Bhasini has no accounts, so it holds no profile of any user, whatever their age.</p>
+
+  <h2 id="changes">Changes and contact</h2>
+  <p>If this policy changes, we will update this page and the date at the top. If a change affects how tool
+  data is handled, we will also update the plugin listing.</p>
+  <p>Data controller: Codegres, India. Questions or requests: <a href="mailto:naveen@codegres.com">naveen@codegres.com</a> · <a href="https://codegres.com">codegres.com</a></p>
   <p><a href="/">← Back to Bhasini</a> · <a href="terms.html">Terms of Service</a></p>
 </main>
 </body>

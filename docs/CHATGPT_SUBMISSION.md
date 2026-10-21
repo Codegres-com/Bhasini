@@ -31,11 +31,11 @@ There is no login, so no reviewer account is needed.
 
 | Field | Value | Limit |
 |---|---|---|
-| `displayName` | Bhasini | 7 / 30 |
-| `shortDescription` | Write in 22 Indian scripts | 26 / 30 |
+| `displayName` | Bhasini Indic Scripts | 21 / 30 |
+| `shortDescription` | Spell words in Indian scripts | 29 / 30 |
 | `developerName` | Codegres | 8 / 80 |
 | `category` | Productivity | dashboard category |
-| `longDescription` | see below | 1,480 / 4,000 |
+| `longDescription` | see below | 1,441 / 4,000 |
 | `websiteURL` / `supportURL` | https://bhasini.com/mcp/ | |
 | `privacyPolicyURL` | https://bhasini.com/privacy.html | |
 | `termsOfServiceURL` | https://bhasini.com/terms.html | |
@@ -48,20 +48,20 @@ There is no login, so no reviewer account is needed.
 
 **Long description**
 
-> Bhasini gives ChatGPT exact, rule-based spelling for all 22 scheduled languages of India: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu.
+> Bhasini Indic Scripts writes text in the native scripts of the 22 scheduled languages of India: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu.
 >
-> Language models often misspell Indian scripts, especially less common ones such as Ol Chiki (Santali), Meetei Mayek (Manipuri) and Perso-Arabic Kashmiri and Sindhi. Bhasini uses the same deterministic engine as the free bhasini.com editor, so the letters are always right.
+> It uses a rule-based transliteration engine, so the same input always gives the same spelling. It covers less widely supported scripts too, such as Ol Chiki (Santali), Meetei Mayek (Manipuri) and Perso-Arabic Kashmiri and Sindhi.
 >
 > What you can ask:
 > - Write words in a native script: "Write vaNakkam and nanRi in Tamil script" gives வணக்கம், நன்றி.
 > - Convert text between Indian scripts: Hindi नमस्ते भारत becomes Kannada ನಮಸ್ತೇ ಭಾರತ, so a reader of one script can read text written in another.
 > - Learn to type: find the keys for any letter on a phonetic keyboard, such as zh for ழ in Tamil.
 > - Write numbers in native numerals: 2026 becomes २०२६ in Hindi or ২০২৬ in Bengali.
-> - Look up the supported languages, scripts and codes.
+> - Look up the supported languages, scripts and language codes.
 >
-> Bhasini transliterates (it writes sounds in another script); it does not translate meaning. ChatGPT translates, and Bhasini makes sure the result is spelled correctly.
+> Bhasini transliterates: it writes the sounds of words in another script. It does not translate meaning.
 >
-> No account or sign-in is needed. Bhasini does not store or log the text you send, and it never sees your conversation, only the words passed to its tools.
+> No account or sign-in is needed. Bhasini receives only the text passed to its tools, never your conversation. That text is converted in memory and is not stored or logged. See the privacy policy for details.
 >
 > Made by Codegres. The engine is open source under the MIT license at github.com/Codegres-com/Bhasini.
 
@@ -151,6 +151,8 @@ Upload as **unlisted** (YouTube) or link-shared (Drive), and check that the link
 
 ## 6. Risks to be ready for
 
-- **Name:** "Bhasini" is close to the government's BHASHINI. If a reviewer raises it, explain that it's a separate open-source project by Codegres, or change `displayName` to "Bhasini Indic".
+- **First review (21 Oct 2026) was rejected** for (1) an incomplete privacy policy and (2) name/description quality. Fixes in 0.1.1:
+  - `privacy.html` now lists, for the hosted server, each tool's inputs and outputs, the purposes, recipients, a retention table and user controls, matching what the Worker does (no tool text logged; IP used as a 60-second rate-limit key; Workers operational logs, retention ≤7 days, since `[observability]` is on in `wrangler.toml`). If you change logging or retention, update the policy first.
+  - The listing no longer compares itself to other language models, makes "always right" claims or mentions "free" (OpenAI disallows comparisons, unverifiable claims and pricing in descriptions). The display name is now "Bhasini Indic Scripts", which says what it does and keeps it apart from the government's BHASHINI.
 - **Negative case 1 depends on the model.** If ChatGPT calls `transliterate` on English during review, improve the `transliterate` tool description in `src/Bhasini.Mcp/IndicTools.cs` (it already says "not translation"), then run `npm run fixtures` and redeploy the Worker. The server is re-scanned daily.
 - **Rate limit:** 120 requests a minute per IP. Reviewers won't hit it, but heavy shared networks could. It's set in `workers/bhasini-mcp/wrangler.toml`.

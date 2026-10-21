@@ -14,20 +14,20 @@ import sys
 
 DEMO_VIDEO_URL = "https://youtu.be/uA634C1x7o8"  # an unlisted YouTube or Drive link reviewers can open
 
-LONG_DESCRIPTION = """Bhasini gives ChatGPT exact, rule-based spelling for all 22 scheduled languages of India: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu.
+LONG_DESCRIPTION = """Bhasini Indic Scripts writes text in the native scripts of the 22 scheduled languages of India: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu.
 
-Language models often misspell Indian scripts, especially less common ones such as Ol Chiki (Santali), Meetei Mayek (Manipuri) and Perso-Arabic Kashmiri and Sindhi. Bhasini uses the same deterministic engine as the free bhasini.com editor, so the letters are always right.
+It uses a rule-based transliteration engine, so the same input always gives the same spelling. It covers less widely supported scripts too, such as Ol Chiki (Santali), Meetei Mayek (Manipuri) and Perso-Arabic Kashmiri and Sindhi.
 
 What you can ask:
 - Write words in a native script: "Write vaNakkam and nanRi in Tamil script" gives வணக்கம், நன்றி.
 - Convert text between Indian scripts: Hindi नमस्ते भारत becomes Kannada ನಮಸ್ತೇ ಭಾರತ, so a reader of one script can read text written in another.
 - Learn to type: find the keys for any letter on a phonetic keyboard, such as zh for ழ in Tamil.
 - Write numbers in native numerals: 2026 becomes २०२६ in Hindi or ২০২৬ in Bengali.
-- Look up the supported languages, scripts and codes.
+- Look up the supported languages, scripts and language codes.
 
-Bhasini transliterates (it writes sounds in another script); it does not translate meaning. ChatGPT translates, and Bhasini makes sure the result is spelled correctly.
+Bhasini transliterates: it writes the sounds of words in another script. It does not translate meaning.
 
-No account or sign-in is needed. Bhasini does not store or log the text you send, and it never sees your conversation, only the words passed to its tools.
+No account or sign-in is needed. Bhasini receives only the text passed to its tools, never your conversation. That text is converted in memory and is not stored or logged. See the privacy policy for details.
 
 Made by Codegres. The engine is open source under the MIT license at github.com/Codegres-com/Bhasini."""
 
@@ -85,8 +85,8 @@ NEGATIVE = [
 manifest = {
     "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
     "name": "bhasini",
-    "version": "0.1.0",
-    "description": "Exact transliteration and script conversion for the 22 scheduled languages of India.",
+    "version": "0.1.1",
+    "description": "Transliteration and script conversion for the 22 scheduled languages of India.",
     "author": {"name": "Codegres", "email": "naveen@codegres.com", "url": "https://codegres.com"},
     "homepage": "https://bhasini.com/mcp/",
     "repository": "https://github.com/Codegres-com/Bhasini",
@@ -95,8 +95,8 @@ manifest = {
     "extensions": {
         "com.openai": {
             "interface": {
-                "displayName": "Bhasini",
-                "shortDescription": "Write in 22 Indian scripts",
+                "displayName": "Bhasini Indic Scripts",
+                "shortDescription": "Spell words in Indian scripts",
                 "longDescription": LONG_DESCRIPTION,
                 "developerName": "Codegres",
                 "category": "Productivity",

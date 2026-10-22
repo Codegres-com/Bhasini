@@ -98,14 +98,14 @@ url = "https://mcp.bhasini.com/mcp"</code></pre>
   <p>You need the <a href="https://dotnet.microsoft.com/download">.NET SDK</a>. The <code>dnx</code> command comes with .NET 10 or later.</p>
 
   <h3>Claude Code</h3>
-  <pre><code>claude mcp add bhasini -- dnx Bhasini.Mcp@0.1.0 --yes</code></pre>
+  <pre><code>claude mcp add bhasini -- dnx Bhasini.Mcp@0.2.0 --yes</code></pre>
 
   <h3>Claude Desktop, Cursor, Windsurf and other JSON configs</h3>
   <pre><code>{
   "mcpServers": {
     "bhasini": {
       "command": "dnx",
-      "args": ["Bhasini.Mcp@0.1.0", "--yes"]
+      "args": ["Bhasini.Mcp@0.2.0", "--yes"]
     }
   }
 }</code></pre>
@@ -113,12 +113,12 @@ url = "https://mcp.bhasini.com/mcp"</code></pre>
   <h3>OpenAI Codex CLI <small>(~/.codex/config.toml)</small></h3>
   <pre><code>[mcp_servers.bhasini]
 command = "dnx"
-args = ["Bhasini.Mcp@0.1.0", "--yes"]</code></pre>
+args = ["Bhasini.Mcp@0.2.0", "--yes"]</code></pre>
 
   <h3>VS Code <small>(.vscode/mcp.json)</small></h3>
   <pre><code>{
   "servers": {
-    "bhasini": { "type": "stdio", "command": "dnx", "args": ["Bhasini.Mcp@0.1.0", "--yes"] }
+    "bhasini": { "type": "stdio", "command": "dnx", "args": ["Bhasini.Mcp@0.2.0", "--yes"] }
   }
 }</code></pre>
 

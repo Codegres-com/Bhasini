@@ -1,7 +1,7 @@
 {
   "name": "bhasini",
-  "version": "0.1.0",
-  "description": "Exact transliteration and script conversion for all 22 scheduled languages of India, from Hindi and Tamil to Santali (Ol Chiki) and Manipuri (Meetei Mayek). Uses the hosted Bhasini MCP server; nothing to install.",
+  "version": "0.2.0",
+  "description": "Exact transliteration, script conversion and translation for all 22 scheduled languages of India, from Hindi and Tamil to Santali (Ol Chiki) and Manipuri (Meetei Mayek). Uses the hosted Bhasini MCP server; nothing to install.",
   "author": {
     "name": "Codegres",
     "email": "naveen@codegres.com",
@@ -17,6 +17,7 @@
     "hindi",
     "tamil",
     "transliteration",
+    "translation",
     "languages",
     "unicode"
   ]

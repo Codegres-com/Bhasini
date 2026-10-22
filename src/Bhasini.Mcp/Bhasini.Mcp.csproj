@@ -16,7 +16,7 @@
     <ToolCommandName>bhasini-mcp</ToolCommandName>
     <PackageId>Bhasini.Mcp</PackageId>
     <PackageType>McpServer</PackageType>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Codegres</Authors>
     <Description>MCP server for Indian languages: transliterate romanised text into all 22 scheduled languages, convert between Indian scripts, look up keyboard layouts and translate (IndicTrans2). Everything but translate runs locally.</Description>
     <PackageTags>mcp;indic;transliteration;translation;hindi;tamil;kannada;india;ai</PackageTags>

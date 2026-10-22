@@ -14,20 +14,21 @@ import sys
 
 DEMO_VIDEO_URL = "https://youtu.be/uA634C1x7o8"  # an unlisted YouTube or Drive link reviewers can open
 
-LONG_DESCRIPTION = """Bhasini Indic Scripts writes text in the native scripts of the 22 scheduled languages of India: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu.
+LONG_DESCRIPTION = """Bhasini Indic Scripts writes and translates text in the 22 scheduled languages of India: Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili, Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu.
 
-It uses a rule-based transliteration engine, so the same input always gives the same spelling. It covers less widely supported scripts too, such as Ol Chiki (Santali), Meetei Mayek (Manipuri) and Perso-Arabic Kashmiri and Sindhi.
+Spelling uses a rule-based transliteration engine, so the same input always gives the same spelling. It covers less widely supported scripts too, such as Ol Chiki (Santali), Meetei Mayek (Manipuri) and Perso-Arabic Kashmiri and Sindhi.
 
 What you can ask:
 - Write words in a native script: "Write vaNakkam and nanRi in Tamil script" gives வணக்கம், நன்றி.
 - Convert text between Indian scripts: Hindi नमस्ते भारत becomes Kannada ನಮಸ್ತೇ ಭಾರತ, so a reader of one script can read text written in another.
+- Translate between English and any of the 22 languages, or between two of them: "Where is the railway station?" becomes Tamil ரயில் நிலையம் எங்கே?
 - Learn to type: find the keys for any letter on a phonetic keyboard, such as zh for ழ in Tamil.
 - Write numbers in native numerals: 2026 becomes २०२६ in Hindi or ২০২৬ in Bengali.
 - Look up the supported languages, scripts and language codes.
 
-Bhasini transliterates: it writes the sounds of words in another script. It does not translate meaning.
+Transliteration writes the sounds of words in another script; translation carries their meaning into another language. Translation runs AI4Bharat IndicTrans2 and Google Gemma on Cloudflare Workers AI, for up to 2,000 characters a request and 10,000 characters a day.
 
-No account or sign-in is needed. Bhasini receives only the text passed to its tools, never your conversation. That text is converted in memory and is not stored or logged. See the privacy policy for details.
+No account or sign-in is needed. Bhasini receives only the text passed to its tools, never your conversation. That text is processed in memory and is not stored or logged. See the privacy policy for details.
 
 Made by Codegres. The engine is open source under the MIT license at github.com/Codegres-com/Bhasini."""
 
@@ -57,19 +58,18 @@ POSITIVE = [
         "expected_behavior": "Calls native_digits for hi and bn and replies with २०२६ and ২০২৬.",
     },
     {
-        "description": "Language code and script lookup",
-        "prompt": "Which language code and script does Bhasini use for Santali?",
-        "tools_triggered": "list_languages",
-        "expected_behavior": "Calls list_languages and answers that Santali is sat, written in Ol Chiki (ᱥᱟᱱᱛᱟᱲᱤ).",
+        "description": "English sentence translated into Tamil",
+        "prompt": "Translate 'Where is the railway station?' into Tamil.",
+        "tools_triggered": "translate",
+        "expected_behavior": "Calls translate with targetLanguage ta and replies with ரயில் நிலையம் எங்கே?",
     },
 ]
 
 NEGATIVE = [
     {
-        "description": "Translation request. Bhasini writes sounds in another script and does not translate meaning, "
-                       "so it must not be used to turn English words into Tamil letters. Expected: ChatGPT translates "
-                       "itself (it may then use transliterate only on a romanised Tamil translation).",
-        "prompt": "Translate 'How are you?' into Tamil.",
+        "description": "Translation between two languages that are not Indian. Bhasini only translates to and from "
+                       "the 22 scheduled languages of India, so no Bhasini tool should be called; ChatGPT translates itself.",
+        "prompt": "Translate 'Bonjour, comment ça va ?' into English.",
     },
     {
         "description": "Unrelated coding request. No Bhasini tool should be called.",
@@ -85,13 +85,13 @@ NEGATIVE = [
 manifest = {
     "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
     "name": "bhasini",
-    "version": "0.1.1",
-    "description": "Transliteration and script conversion for the 22 scheduled languages of India.",
+    "version": "0.2.0",
+    "description": "Transliteration, script conversion and translation for the 22 scheduled languages of India.",
     "author": {"name": "Codegres", "email": "naveen@codegres.com", "url": "https://codegres.com"},
     "homepage": "https://bhasini.com/mcp/",
     "repository": "https://github.com/Codegres-com/Bhasini",
     "license": "MIT",
-    "keywords": ["indic", "india", "hindi", "tamil", "transliteration", "languages"],
+    "keywords": ["indic", "india", "hindi", "tamil", "transliteration", "translation", "languages"],
     "extensions": {
         "com.openai": {
             "interface": {
@@ -103,6 +103,7 @@ manifest = {
                 "capabilities": [
                     "Transliterate romanised words into 22 Indian language scripts",
                     "Convert text between Indian scripts, e.g. Devanagari to Kannada",
+                    "Translate text between English and 22 Indian languages, or between two of them",
                     "Show the phonetic keyboard keys for any letter",
                     "Write digits in native numerals",
                 ],
@@ -112,7 +113,7 @@ manifest = {
                 "termsOfServiceURL": "https://bhasini.com/terms.html",
                 "defaultPrompt": [
                     "Write vaNakkam and nanRi in Tamil script",
-                    "Rewrite नमस्ते भारत in Kannada script",
+                    "Translate 'Where is the railway station?' into Tamil",
                     "Write the Santali word johar in Ol Chiki",
                 ],
                 "brandColor": "#F07B2B",
@@ -126,8 +127,9 @@ manifest = {
                 "commerce": False,
             },
             "publication": {
-                "release_notes": "First release: transliterate, convert_script, get_keymap, native_digits and "
-                                 "list_languages for the 22 scheduled languages of India.",
+                "release_notes": "New translate tool: translate text between English and the 22 scheduled "
+                                 "languages of India, or between two of them (AI4Bharat IndicTrans2 and Google "
+                                 "Gemma on Cloudflare Workers AI). Up to 2,000 characters a request and 10,000 a day.",
                 "countries": [],
             },
         }

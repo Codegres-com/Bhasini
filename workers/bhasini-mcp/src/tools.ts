@@ -1,6 +1,9 @@
 import { findLanguage, LANGUAGES, sample, supportsInscript, type IndicLanguage } from "./engine/catalog.ts";
 import { canConvertTo, convertScript, fromRoman } from "./engine/convert.ts";
 import definitions from "./generated/tools.json" with { type: "json" };
+import { ApiError } from "./accounts.ts";
+import { LimitError, UnavailableError } from "./quota.ts";
+import { TranslateError, type TranslateRequest, type TranslateResult } from "./translate.ts";
 
 // The same tools as src/Bhasini.Mcp/IndicTools.cs. Names, descriptions, input schemas and
 // annotations come from generated/tools.json, which tools/Bhasini.FixtureGen exports from the C#
@@ -10,6 +13,12 @@ export const TOOL_DEFINITIONS = definitions;
 
 // A tool failure that is reported to the model as an error result (C# McpException).
 export class ToolError extends Error {}
+
+// What a tool may need from the Worker. Only translate uses it: the Worker passes a function that
+// already applies the free limits for the caller's IP (quota.ts).
+export interface ToolContext {
+  translate?: (request: TranslateRequest) => Promise<TranslateResult>;
+}
 
 const MAX_TEXT = 20_000;
 
@@ -65,24 +74,32 @@ export function nativeDigits(args: Record<string, unknown>): string {
   return input.replace(/[0-9]/g, (d) => digit(d.charCodeAt(0) - 48));
 }
 
-const HANDLERS: Record<string, (args: Record<string, unknown>) => unknown> = {
+// The C# server forwards translate to https://mcp.bhasini.com/v1/translate; here it runs in place.
+export async function translateTool(args: Record<string, unknown>, ctx: ToolContext): Promise<string> {
+  if (!ctx.translate) throw new ToolError("Translation is not available on this server.");
+  const result = await ctx.translate({ text: args.text, source: args.sourceLanguage, target: args.targetLanguage });
+  return result.translation;
+}
+
+const HANDLERS: Record<string, (args: Record<string, unknown>, ctx: ToolContext) => unknown> = {
   list_languages: () => listLanguages(),
   transliterate,
   convert_script: convert,
   get_keymap: getKeymap,
   native_digits: nativeDigits,
+  translate: translateTool,
 };
 
 export const hasTool = (name: string): boolean => Object.hasOwn(HANDLERS, name);
 
 // Runs a tool and returns MCP CallToolResult content, the way the C# SDK formats it:
 // strings as-is, anything else as compact JSON, failures as isError results.
-export function callTool(name: string, args: Record<string, unknown>) {
+export async function callTool(name: string, args: Record<string, unknown>, ctx: ToolContext = {}) {
   try {
-    const value = HANDLERS[name](args);
+    const value = await HANDLERS[name](args, ctx);
     return { content: [{ type: "text", text: typeof value === "string" ? value : JSON.stringify(value) }] };
   } catch (e) {
-    if (!(e instanceof ToolError)) throw e;
+    if (!(e instanceof ToolError || e instanceof TranslateError || e instanceof LimitError || e instanceof UnavailableError || e instanceof ApiError)) throw e;
     return { content: [{ type: "text", text: `An error occurred invoking '${name}': ${e.message}` }], isError: true };
   }
 }

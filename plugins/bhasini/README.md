@@ -12,8 +12,8 @@ account needed.
 ## What's inside
 
 - **MCP server `bhasini`**: the hosted Bhasini server at `https://mcp.bhasini.com/mcp` (Streamable HTTP, no
-  authentication). Tools: `list_languages`, `transliterate`, `convert_script`, `get_keymap`, `native_digits`.
-  All are read-only.
+  authentication). Tools: `list_languages`, `transliterate`, `convert_script`, `get_keymap`, `native_digits`,
+  `translate`. All are read-only.
 - **Skill `indic-text`**: tells Claude when to use those tools instead of writing Indic letters from memory.
 
 ## What it runs, sends and fetches
@@ -21,9 +21,10 @@ account needed.
 - Runs nothing on your computer. The plugin only connects Claude to the hosted server.
 - Sends the arguments of each tool call (the text to convert and a language code) to
   `https://mcp.bhasini.com/mcp`, which runs on Cloudflare Workers. It never receives your conversation.
+  Text sent to `translate` is translated by Cloudflare Workers AI and not stored.
 - Fetches nothing else.
 
-Prefer to keep everything on your machine? The same server is available as a local, offline .NET tool:
+Prefer to keep everything on your machine? The same server is available as a local .NET tool (offline except `translate`):
 [Bhasini.Mcp on NuGet](https://www.nuget.org/packages/Bhasini.Mcp) (`dnx Bhasini.Mcp@0.1.0 --yes`).
 
 ## Example prompts

@@ -173,7 +173,7 @@ Open models with commercial-friendly licences: **AI4Bharat IndicTrans2 (MIT)** f
 | Typing widget | ≤10K page-views, "Powered by Bhasini" badge | ₹999 / site / month without badge | Growth loop |
 | Speech-to-text | 60 min | ₹0.40 / min batch · ₹0.60 / min realtime | Diarization +₹0.10 |
 | Text-to-speech | 50K chars | ₹15–25 / 10K chars | Cached replays billed at 10% |
-| Translation | 100K chars | ₹15 / 10K chars · documents ₹4 / 1K chars | |
+| Translation | 100K chars | ₹15 / 10K chars · documents ₹4 / 1K chars | Superseded: ₹5 / 10K, see [TRANSLATION_API_PLAN.md](TRANSLATION_API_PLAN.md) |
 | Speech-to-speech | 10 min | ₹2.5 / min | |
 | Dubbing | 5 min | ₹15–30 / min | Lip-sync later as premium |
 | Custom voice | n/a | ₹25K setup + usage | Consent required |

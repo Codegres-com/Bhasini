@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Bhasini MCP Server — Indian Languages for Claude, ChatGPT &amp; AI Agents</title>
-<meta name="description" content="Free MCP server for all 22 Indian languages: exact transliteration, script conversion, keyboard maps and native digits for Claude, ChatGPT, Codex, Cursor and VS Code. Hosted at mcp.bhasini.com or run locally." />
+<meta name="description" content="Free MCP server for all 22 Indian languages: translation (IndicTrans2), exact transliteration, script conversion, keyboard maps and native digits for Claude, ChatGPT, Codex, Cursor and VS Code. Hosted at mcp.bhasini.com or run locally." />
 <link rel="icon" type="image/svg+xml" href="/bhasini-logo.svg" />
 <link rel="canonical" href="https://bhasini.com/mcp/" />
 <meta property="og:type" content="website" />
@@ -58,6 +58,7 @@
       <tr><td><code>convert_script</code></td><td>One Indian script to another</td><td><span class="native">नमस्ते</span> + <code>kn</code> → <span class="native">ನಮಸ್ತೇ</span></td></tr>
       <tr><td><code>get_keymap</code></td><td>Phonetic keyboard map for a language</td><td>Keys for every letter of Meetei Mayek</td></tr>
       <tr><td><code>native_digits</code></td><td>Digits in native numerals</td><td><code>2026</code> + <code>hi</code> → <span class="native">२०२६</span></td></tr>
+      <tr><td><code>translate</code></td><td>Meaning between English and the 22 languages (AI4Bharat IndicTrans2)</td><td><code>Where is the station?</code> + <code>hi</code> → <span class="native">स्टेशन कहाँ है?</span></td></tr>
       <tr><td><code>list_languages</code></td><td>Supported languages and codes</td><td><code>hi</code>, <code>ta</code>, <code>sat</code>, <code>mni</code>, <code>ks</code>, …</td></tr>
     </tbody>
   </table>
@@ -93,7 +94,7 @@ url = "https://mcp.bhasini.com/mcp"</code></pre>
   }
 }</code></pre>
 
-  <h2>Or run it locally (offline)</h2>
+  <h2>Or run it locally (offline except <code>translate</code>)</h2>
   <p>You need the <a href="https://dotnet.microsoft.com/download">.NET SDK</a>. The <code>dnx</code> command comes with .NET 10 or later.</p>
 
   <h3>Claude Code</h3>

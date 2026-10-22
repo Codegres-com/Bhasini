@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Bhasini.Core.Languages;
 using Bhasini.Core.Scripts;
 using ModelContextProtocol;
@@ -66,6 +68,40 @@ namespace Bhasini.Mcp
             var target = Find(language);
             if (target.DigitMapper == null) throw new McpException($"{target.Name} has no native digits.");
             return string.Concat(text.Select(c => c is >= '0' and <= '9' ? target.DigitMapper(c - '0') : c));
+        }
+
+        // The one tool that leaves the machine: translation runs on Workers AI behind mcp.bhasini.com.
+        // BHASINI_TRANSLATE_URL points it at another deployment (e.g. `wrangler dev`). BHASINI_API_KEY
+        // (from https://bhasini.com/api/) charges translations to that account instead of the free limits.
+        private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(60) };
+
+        private static Uri TranslateUrl => new(Environment.GetEnvironmentVariable("BHASINI_TRANSLATE_URL") ?? "https://mcp.bhasini.com/v1/translate");
+
+        [McpServerTool(Name = "translate", Title = "Translate text", ReadOnly = true, Destructive = false, Idempotent = true, OpenWorld = true)]
+        [Description("Translates the meaning of text between English and the 22 scheduled languages of India, or between two of them, e.g. 'Where is the station?' → 'स्टेशन कहाँ है?' (Hindi). " +
+                     "English → Indic uses AI4Bharat IndicTrans2; Indic → English uses Gemma 4; Indic → Indic goes through English. Free use: up to 2,000 characters per call, 5 calls a minute and 10,000 characters a day. " +
+                     "Unlike the other tools this sends the text to Bhasini's server (mcp.bhasini.com); the text is not stored. " +
+                     "To write romanised words in a script by sound, use transliterate instead.")]
+        public static async Task<string> Translate(
+            [Description("Text to translate. Line breaks are kept.")] string text,
+            [Description("Language to translate into: a code or name from list_languages, or 'en' for English.")] string targetLanguage,
+            [Description("Language of the text, or 'auto' (default) to detect it.")] string sourceLanguage = "auto",
+            CancellationToken cancellationToken = default)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, TranslateUrl)
+            {
+                Content = JsonContent.Create(new { text, source = sourceLanguage, target = targetLanguage }),
+            };
+            var apiKey = Environment.GetEnvironmentVariable("BHASINI_API_KEY");
+            if (!string.IsNullOrWhiteSpace(apiKey)) request.Headers.Authorization = new("Bearer", apiKey.Trim());
+            using var response = await Http.SendAsync(request, cancellationToken);
+            using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+            if (!response.IsSuccessStatusCode || !body.RootElement.TryGetProperty("translation", out var translation))
+            {
+                var error = body.RootElement.TryGetProperty("error", out var e) ? e.GetString() : null;
+                throw new McpException(error ?? $"Translation failed ({(int)response.StatusCode}).");
+            }
+            return translation.GetString() ?? "";
         }
 
         // Unlike LanguageCatalog.Get, an unknown language is an error rather than Hindi.

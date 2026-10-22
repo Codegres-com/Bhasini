@@ -18,8 +18,8 @@
     <PackageType>McpServer</PackageType>
     <Version>0.1.0</Version>
     <Authors>Codegres</Authors>
-    <Description>MCP server for Indian languages: transliterate romanised text into all 22 scheduled languages, convert between Indian scripts and look up keyboard layouts. Runs locally, no network calls.</Description>
-    <PackageTags>mcp;indic;transliteration;hindi;tamil;kannada;india;ai</PackageTags>
+    <Description>MCP server for Indian languages: transliterate romanised text into all 22 scheduled languages, convert between Indian scripts, look up keyboard layouts and translate (IndicTrans2). Everything but translate runs locally.</Description>
+    <PackageTags>mcp;indic;transliteration;translation;hindi;tamil;kannada;india;ai</PackageTags>
     <PackageProjectUrl>https://bhasini.com</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Codegres-com/Bhasini</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

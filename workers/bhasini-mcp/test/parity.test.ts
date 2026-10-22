@@ -54,10 +54,12 @@ test("native_digits matches C#", () => {
 
 test("tool definitions are the ones exported from C#", () => {
   const names = TOOL_DEFINITIONS.map((t) => t.name).sort();
-  assert.deepEqual(names, ["convert_script", "get_keymap", "list_languages", "native_digits", "transliterate"]);
+  assert.deepEqual(names, ["convert_script", "get_keymap", "list_languages", "native_digits", "translate", "transliterate"]);
   for (const t of TOOL_DEFINITIONS) {
     assert.equal(t.annotations.readOnlyHint, true, t.name);
     assert.equal(t.annotations.destructiveHint, false, t.name);
     assert.ok(t.title, t.name);
+    // Only translate leaves the machine.
+    assert.equal(t.annotations.openWorldHint, t.name === "translate", t.name);
   }
 });

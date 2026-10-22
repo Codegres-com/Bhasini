@@ -17,10 +17,64 @@ name = "RATE_LIMITER"
 namespace_id = "1001"
 simple = { limit = 120, period = 60 }
 
+# Free anonymous translation: 5 requests per minute per client IP (/v1/translate and the MCP translate tool).
+[[ratelimits]]
+name = "TRANSLATE_LIMITER"
+namespace_id = "1002"
+simple = { limit = 5, period = 60 }
+
+# Exact daily character counters for free translation: one per IP (hashed) and one for everyone.
+# See src/quota.ts. SQLite-backed, so it also works on the Workers Free plan.
+[[durable_objects.bindings]]
+name = "TRANSLATE_QUOTA"
+class_name = "TranslateQuota"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["TranslateQuota"]
+
+# Translation API accounts: paid requests per minute per account, and sign-up attempts per minute per IP.
+[[ratelimits]]
+name = "KEY_LIMITER"
+namespace_id = "1003"
+simple = { limit = 300, period = 60 }
+
+[[ratelimits]]
+name = "SIGNUP_LIMITER"
+namespace_id = "1004"
+simple = { limit = 3, period = 60 }
+
+# Accounts, API keys (hashed), credits, Razorpay orders and daily usage. Schema: migrations/.
+# Create once: npx wrangler d1 create bhasini-api, then put the printed database_id here.
+[[d1_databases]]
+binding = "DB"
+database_name = "bhasini-api"
+database_id = "36013ded-eff6-4e46-82d1-ee1a8544d637"
+migrations_dir = "migrations"
+
+# Workers AI runs the translation models (IndicTrans2, Gemma 4). See src/translate.ts.
+[ai]
+binding = "AI"
+
 # OpenAI plugin domain verification, served at /.well-known/openai-apps-challenge.
 # The token is meant to be public; replace it if OpenAI issues a new one.
 [vars]
 OPENAI_APPS_CHALLENGE = "DCusztdkOsrNne0CMqsrnDwZOFCgnrVv7OlCB2XTfrQ"
+# Set to "false" to switch translation off (e.g. if Workers AI spend spikes).
+TRANSLATE_ENABLED = "true"
+# Free translation limits (characters). The global budget caps the Workers AI bill for free traffic:
+# 3 lakh chars a day costs at most about Rs 10, mostly inside Workers AI's free daily allowance.
+# Change and redeploy to adjust (docs/TRANSLATION_API_PLAN.md, section 2).
+FREE_MAX_CHARS_PER_REQUEST = "2000"
+FREE_DAILY_CHARS_PER_IP = "10000"
+FREE_DAILY_CHARS_GLOBAL = "300000"
+# Characters a new API account starts with.
+SIGNUP_FREE_CHARS = "10000"
+# Razorpay key id (public; rzp_test_… or rzp_live_…). The secrets are set with
+#   npx wrangler secret put RAZORPAY_KEY_SECRET
+#   npx wrangler secret put RAZORPAY_WEBHOOK_SECRET
+# and, for wrangler dev, in .dev.vars (never committed).
+RAZORPAY_KEY_ID = "rzp_live_Tqr8hIr1n58mzT"
 
 [observability]
 enabled = true

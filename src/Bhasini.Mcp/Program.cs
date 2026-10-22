@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
 
 // Bhasini MCP server over stdio. Everything runs on the user's machine with the same engine as
-// bhasini.com, so no text leaves the device and there is no server to host.
+// bhasini.com, except translate, which calls https://mcp.bhasini.com/v1/translate.
 var builder = Host.CreateApplicationBuilder(args);
 
 // stdout carries the MCP protocol; logs go to stderr.

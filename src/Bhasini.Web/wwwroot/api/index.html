@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bhasini Translation API — English and 22 Indian Languages</title>
+<meta name="description" content="Translation API for English and all 22 scheduled languages of India, powered by AI4Bharat IndicTrans2. Sign up free, then pay as you go: ₹5 per 10,000 characters." />
+<link rel="icon" type="image/svg+xml" href="/bhasini-logo.svg" />
+<link rel="canonical" href="https://bhasini.com/api/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Bhasini Translation API" />
+<meta property="og:description" content="Translate between English and 22 Indian languages with one API key. ₹5 per 10,000 characters." />
+<meta property="og:url" content="https://bhasini.com/api/" />
+<meta property="og:image" content="https://bhasini.com/og-image.jpg" />
+<link rel="stylesheet" href="/api/api.css" />
+</head>
+<body>
+<main>
+  <p><a href="/">← Bhasini</a></p>
+  <h1>Bhasini Translation API</h1>
+  <p class="lead">Translate between English and all 22 scheduled languages of India, or between any two of
+  them, with one API key. English → Indian languages use AI4Bharat IndicTrans2; Indian languages → English
+  use Google Gemma, on Cloudflare.</p>
+
+  <h2>Pricing</h2>
+  <p>New accounts get <strong>10,000 characters free</strong>. After that, buy prepaid credits:
+  <strong>₹5 per 10,000 characters</strong>, billed on the characters you send.</p>
+  <div class="grid" id="packs">
+    <div class="card pack"><div class="price">₹500</div><div class="chars">10,00,000 characters</div></div>
+    <div class="card pack"><div class="price">₹2,000</div><div class="chars">44,00,000 characters</div></div>
+    <div class="card pack"><div class="price">₹5,000</div><div class="chars">1,20,00,000 characters</div></div>
+  </div>
+  <p class="muted">Credits are valid for 12 months. Up to 5,000 characters per request and 300 requests a
+  minute per key. Without a key, translation is free up to 10,000 characters a day.</p>
+
+  <h2>Languages</h2>
+  <p>English to and from Assamese, Bengali, Bodo, Dogri, Gujarati, Hindi, Kannada, Kashmiri, Konkani, Maithili,
+  Malayalam, Manipuri, Marathi, Nepali, Odia, Punjabi, Sanskrit, Santali, Sindhi, Tamil, Telugu and Urdu, and
+  between any two of them.</p>
+  <!-- api-language-links: tools/Bhasini.SiteGen puts links to the language pages here at publish time -->
+
+  <!-- Signed out: sign up or sign in -->
+  <section id="signed-out">
+    <h2>Get started</h2>
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-signup" aria-selected="true" aria-controls="form-signup">Get an API key</button>
+        <button role="tab" id="tab-signin" aria-selected="false" aria-controls="form-signin">I have a key</button>
+      </div>
+
+      <form id="form-signup" role="tabpanel" aria-labelledby="tab-signup">
+        <label for="email">Email</label>
+        <input id="email" type="email" required autocomplete="email" placeholder="you@company.com" />
+        <label for="name">Name or company <span class="muted">(optional)</span></label>
+        <input id="name" type="text" autocomplete="organization" maxlength="100" />
+        <label style="display:flex; gap:8px; align-items:flex-start; color:#222">
+          <input id="agree" type="checkbox" required style="margin-top:.35em" />
+          <span>I agree to the <a href="/terms.html" target="_blank">Terms</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a>.</span>
+        </label>
+        <div class="row"><button type="submit" id="signup-button">Create my API key</button></div>
+      </form>
+
+      <form id="form-signin" role="tabpanel" aria-labelledby="tab-signin" hidden>
+        <label for="key-input">Your API key</label>
+        <input id="key-input" type="password" required autocomplete="off" placeholder="bk_live_…" spellcheck="false" />
+        <div class="row"><button type="submit" id="signin-button">Sign in</button></div>
+        <p class="muted">Lost your key? Write to <a href="mailto:naveen@codegres.com">naveen@codegres.com</a> from the email you signed up with.</p>
+      </form>
+      <div id="signed-out-error" class="error" role="alert" hidden></div>
+    </div>
+  </section>
+
+  <!-- Signed in: dashboard -->
+  <section id="signed-in" hidden>
+    <h2>Your account</h2>
+    <div id="new-key" class="card" hidden style="margin-bottom:14px">
+      <strong>Your API key. Copy it now: it is shown only once.</strong>
+      <div class="key" style="margin-top:8px"><span id="new-key-value"></span><button class="secondary" id="copy-key" type="button">Copy</button></div>
+      <p class="muted" style="margin-bottom:0">Keep it secret: anyone with this key can spend your credits. This browser remembers it until you sign out.</p>
+    </div>
+
+    <div class="card">
+      <div class="muted" id="account-email"></div>
+      <div class="balance" id="balance">–</div>
+      <div class="muted">characters left · key <code id="key-prefix"></code>…</div>
+      <div class="row">
+        <button class="secondary" type="button" id="rotate">Replace key</button>
+        <button class="secondary" type="button" id="signout">Sign out</button>
+      </div>
+      <div id="account-message" role="status" hidden></div>
+    </div>
+
+    <h2>Buy credits</h2>
+    <div class="grid" id="buy"></div>
+    <p class="muted" id="payments-off" hidden>Payments are being set up. Please check back soon.</p>
+
+    <h2>Quick start</h2>
+    <pre><code id="curl"></code></pre>
+    <p class="muted">Languages: <code>en</code> plus the codes from the MCP <code>list_languages</code> tool
+    (<code>hi</code>, <code>ta</code>, <code>kn</code>, <code>bn</code>, <code>sat</code>, <code>mni</code>, <code>ks</code>, …).
+    Leave out <code>source</code> to detect it. The reply includes <code>creditsLeft</code>.
+    The same key works with the <a href="/mcp/">MCP server</a>: send it as <code>Authorization: Bearer</code>.</p>
+
+    <h2>Usage (last 30 days)</h2>
+    <table><thead><tr><th>Day</th><th class="num">Characters</th><th class="num">Requests</th></tr></thead><tbody id="usage"></tbody></table>
+
+    <h2>Payments</h2>
+    <table><thead><tr><th>Date</th><th>Pack</th><th class="num">Amount</th><th class="num">Characters</th><th>Payment id</th></tr></thead><tbody id="payments"></tbody></table>
+  </section>
+
+  <p class="muted" style="margin-top:3em">Payments are processed by Razorpay. Questions: <a href="mailto:naveen@codegres.com">naveen@codegres.com</a> ·
+  <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></p>
+</main>
+
+<script>
+(() => {
+  // The API lives on the Worker (workers/bhasini-mcp). ?api= may point a page served from localhost at
+  // a local `wrangler dev`; it is ignored anywhere else, so a link can never send a key elsewhere.
+  const local = ["localhost", "127.0.0.1"].includes(location.hostname);
+  const override = new URLSearchParams(location.search).get("api");
+  const API = local && override && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(override) ? override : "https://mcp.bhasini.com";
+  const STORE = "bhasini.apiKey";
+
+  const $ = (id) => document.getElementById(id);
+  const inr = (n) => Number(n).toLocaleString("en-IN");
+  const store = {
+    get() { try { return localStorage.getItem(STORE); } catch { return null; } },
+    set(v) { try { localStorage.setItem(STORE, v); } catch {} },
+    clear() { try { localStorage.removeItem(STORE); } catch {} },
+  };
+  let apiKey = store.get();
+  let billing = null;
+
+  async function api(method, path, body) {
+    let res;
+    try {
+      res = await fetch(API + path, {
+        method,
+        headers: { "Content-Type": "application/json", ...(apiKey ? { Authorization: "Bearer " + apiKey } : {}) },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+    } catch {
+      throw new Error("Could not reach Bhasini. Check your internet connection and try again.");
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.error || "Something went wrong (" + res.status + ")."), { status: res.status });
+    return data;
+  }
+
+  function show(el, text, kind) {
+    el.textContent = text;
+    el.className = kind;
+    el.hidden = !text;
+  }
+
+  async function busy(button, work) {
+    button.disabled = true;
+    try { await work(); } finally { button.disabled = false; }
+  }
+
+  // ---- Signed out ----
+
+  for (const [tab, other, form, otherForm] of [["tab-signup", "tab-signin", "form-signup", "form-signin"], ["tab-signin", "tab-signup", "form-signin", "form-signup"]]) {
+    $(tab).addEventListener("click", () => {
+      $(tab).setAttribute("aria-selected", "true"); $(other).setAttribute("aria-selected", "false");
+      $(form).hidden = false; $(otherForm).hidden = true;
+      show($("signed-out-error"), "");
+    });
+  }
+
+  $("form-signup").addEventListener("submit", (e) => {
+    e.preventDefault();
+    busy($("signup-button"), async () => {
+      try {
+        apiKey = null;
+        const r = await api("POST", "/v1/account/signup", { email: $("email").value, name: $("name").value });
+        apiKey = r.apiKey;
+        store.set(apiKey);
+        $("new-key-value").textContent = apiKey;
+        $("new-key").hidden = false;
+        render(r.account);
+      } catch (err) { show($("signed-out-error"), err.message, "error"); }
+    });
+  });
+
+  $("form-signin").addEventListener("submit", (e) => {
+    e.preventDefault();
+    busy($("signin-button"), async () => {
+      apiKey = $("key-input").value.trim();
+      try {
+        const account = await api("GET", "/v1/account");
+        store.set(apiKey);
+        $("key-input").value = "";
+        render(account);
+      } catch (err) { apiKey = null; show($("signed-out-error"), err.message, "error"); }
+    });
+  });
+
+  // ---- Signed in ----
+
+  function render(account) {
+    $("signed-out").hidden = true;
+    $("signed-in").hidden = false;
+    $("account-email").textContent = account.name ? account.name + " · " + account.email : account.email;
+    $("balance").textContent = inr(account.credits);
+    $("key-prefix").textContent = account.keyPrefix;
+    $("curl").textContent =
+      "curl https://mcp.bhasini.com/v1/translate \\\n" +
+      "  -H \"Authorization: Bearer " + account.keyPrefix + "…\" \\\n" +
+      "  -H \"Content-Type: application/json\" \\\n" +
+      "  -d '{\"text\": \"Where is the railway station?\", \"target\": \"hi\"}'";
+
+    $("usage").replaceChildren(...(account.usage.length ? account.usage.map((u) => row([u.day, inr(u.chars), inr(u.requests)], [0, 1, 1]))
+      : [row(["No translations yet."], [0], 3)]));
+    $("payments").replaceChildren(...(account.payments.length ? account.payments.map((p) =>
+      row([new Date(p.paidAt).toLocaleDateString("en-IN"), p.pack, "₹" + inr(p.amountPaise / 100), inr(p.chars), p.paymentId], [0, 0, 1, 1, 0]))
+      : [row(["No payments yet."], [0], 5)]));
+  }
+
+  function row(cells, numeric, span) {
+    const tr = document.createElement("tr");
+    cells.forEach((text, i) => {
+      const td = document.createElement("td");
+      td.textContent = text;
+      if (numeric[i]) td.className = "num";
+      if (span) td.colSpan = span;
+      tr.append(td);
+    });
+    return tr;
+  }
+
+  async function refresh() {
+    render(await api("GET", "/v1/account"));
+  }
+
+  $("copy-key").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("new-key-value").textContent); $("copy-key").textContent = "Copied"; }
+    catch { $("copy-key").textContent = "Select and copy"; }
+  });
+
+  $("signout").addEventListener("click", () => {
+    apiKey = null;
+    store.clear();
+    $("new-key").hidden = true;
+    $("signed-in").hidden = true;
+    $("signed-out").hidden = false;
+  });
+
+  $("rotate").addEventListener("click", () => {
+    if (!confirm("Replace your API key? The current key stops working immediately, everywhere you use it.")) return;
+    busy($("rotate"), async () => {
+      try {
+        const r = await api("POST", "/v1/account/rotate-key");
+        apiKey = r.apiKey;
+        store.set(apiKey);
+        $("new-key-value").textContent = apiKey;
+        $("copy-key").textContent = "Copy";
+        $("new-key").hidden = false;
+        render(r.account);
+        show($("account-message"), "Your key was replaced. Update it in your apps.", "success");
+      } catch (err) { show($("account-message"), err.message, "error"); }
+    });
+  });
+
+  // ---- Packs and Razorpay Checkout ----
+
+  function packCards(list, buyable) {
+    return list.map((p) => {
+      const card = document.createElement("div");
+      card.className = "card pack";
+      const base = p.rupees * (billing && billing.charsPerRupee || 2000);
+      const bonus = p.chars > base ? Math.round((p.chars / base - 1) * 100) + "% bonus" : "₹5 per 10,000 characters";
+      card.innerHTML = '<div class="price"></div><div class="chars"></div><div class="note"></div>';
+      card.querySelector(".price").textContent = "₹" + inr(p.rupees);
+      card.querySelector(".chars").textContent = inr(p.chars) + " characters";
+      card.querySelector(".note").textContent = p.name + " · " + bonus;
+      if (buyable) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "Buy";
+        button.style.marginTop = "8px";
+        button.addEventListener("click", () => busy(button, () => buy(p)));
+        card.append(button);
+      }
+      return card;
+    });
+  }
+
+  function loadCheckout() {
+    if (window.Razorpay) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://checkout.razorpay.com/v1/checkout.js";
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("Could not load Razorpay. Check your connection or ad blocker."));
+      document.head.append(s);
+    });
+  }
+
+  async function buy(pack) {
+    const message = $("account-message");
+    try {
+      await loadCheckout();
+      const order = await api("POST", "/v1/billing/order", { pack: pack.id });
+      await new Promise((resolve) => {
+        const checkout = new window.Razorpay({
+          key: order.keyId,
+          order_id: order.orderId,
+          amount: order.amount,
+          currency: order.currency,
+          name: "Bhasini",
+          description: pack.name + " · " + inr(pack.chars) + " translation characters",
+          image: location.origin + "/bhasini-logo.svg",
+          prefill: { email: order.email, name: order.name || "" },
+          notes: { pack: pack.id },
+          theme: { color: "#f07b2b" },
+          handler: async (payment) => {
+            try {
+              render(await api("POST", "/v1/billing/verify", payment));
+              show(message, "Payment received: " + inr(pack.chars) + " characters added. Thank you!", "success");
+            } catch (err) {
+              show(message, err.message + " Your credits will appear within a few minutes if the payment went through.", "error");
+              setTimeout(() => refresh().catch(() => {}), 30_000);
+            }
+            resolve();
+          },
+          modal: { ondismiss: resolve },
+        });
+        checkout.on("payment.failed", (r) => show(message, "Payment failed: " + (r.error && r.error.description || "please try again."), "error"));
+        checkout.open();
+      });
+    } catch (err) {
+      show(message, err.message, "error");
+    }
+    message.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  async function start() {
+    try {
+      billing = await api("GET", "/v1/billing/packs");
+      $("packs").replaceChildren(...packCards(billing.packs, false));
+    } catch { /* keep the static price cards */ }
+    $("buy").replaceChildren(...packCards(billing ? billing.packs : [], Boolean(billing && billing.payments)));
+    $("payments-off").hidden = Boolean(billing && billing.payments);
+
+    if (apiKey) {
+      try { await refresh(); }
+      catch (err) { if (err.status === 401) { apiKey = null; store.clear(); } else show($("signed-out-error"), err.message, "error"); }
+    }
+  }
+  start();
+})();
+</script>
+</body>
+</html>

@@ -98,6 +98,40 @@
     }
   },
   {
+    "name": "translate",
+    "title": "Translate text",
+    "description": "Translates the meaning of text between English and the 22 scheduled languages of India, or between two of them, e.g. 'Where is the station?' → 'स्टेशन कहाँ है?' (Hindi). English → Indic uses AI4Bharat IndicTrans2; Indic → English uses Gemma 4; Indic → Indic goes through English. Free use: up to 2,000 characters per call, 5 calls a minute and 10,000 characters a day. Unlike the other tools this sends the text to Bhasini's server (mcp.bhasini.com); the text is not stored. To write romanised words in a script by sound, use transliterate instead.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "Text to translate. Line breaks are kept.",
+          "type": "string"
+        },
+        "targetLanguage": {
+          "description": "Language to translate into: a code or name from list_languages, or 'en' for English.",
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "description": "Language of the text, or 'auto' (default) to detect it.",
+          "type": "string",
+          "default": "auto"
+        }
+      },
+      "required": [
+        "text",
+        "targetLanguage"
+      ]
+    },
+    "annotations": {
+      "title": "Translate text",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true,
+      "readOnlyHint": true
+    }
+  },
+  {
     "name": "transliterate",
     "title": "Transliterate romanised text",
     "description": "Writes romanised (Latin-letter) text in an Indian script by sound, e.g. 'namaste' → 'नमस्ते' for Hindi or 'vaNakkam' → 'வணக்கம்' for Tamil. This is transliteration, not translation: spell the words as they sound in the target language. Keys follow ITRANS/Baraha conventions: capitals for long vowels and retroflex consonants (A I U E O, T D N L Sh), M = anusvara, H = visarga. Use get_keymap for a language's exact keys.",

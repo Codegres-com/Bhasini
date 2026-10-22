@@ -56,6 +56,16 @@ foreach (var page in SitePages.All)
     File.WriteAllText(Path.Combine(dir, "index.html"), html);
 }
 
+// Translation API landing pages, and links to them on the API page (wwwroot/api/index.html).
+foreach (var page in ApiPages.All)
+{
+    var dir = Path.Combine(root, "api", page.Slug);
+    Directory.CreateDirectory(dir);
+    File.WriteAllText(Path.Combine(dir, "index.html"), ApiPages.Render(site, page));
+}
+var apiHubPath = Path.Combine(root, "api", "index.html");
+File.WriteAllText(apiHubPath, Pages.Replace(File.ReadAllText(apiHubPath), ApiPages.HubPlaceholder, ApiPages.HubLinks()));
+
 var home = Pages.Render(template, site, "/", null, null, Pages.HomeBody(), Pages.HomeJsonLd(site));
 File.WriteAllText(templatePath, home);
 
@@ -65,7 +75,7 @@ File.WriteAllText(Path.Combine(root, "404.html"), notFound);
 
 File.WriteAllText(Path.Combine(root, "sitemap.xml"), Pages.Sitemap(site));
 
-Console.WriteLine($"Wrote {SitePages.All.Count} landing pages, index.html, 404.html and sitemap.xml to {root}");
+Console.WriteLine($"Wrote {SitePages.All.Count} landing pages, {ApiPages.All.Count} API pages, index.html, 404.html and sitemap.xml to {root}");
 return 0;
 
 namespace Bhasini.SiteGen
@@ -401,7 +411,7 @@ namespace Bhasini.SiteGen
             return b.Append("</div>").ToString();
         }
 
-        private static string Faq(IEnumerable<(string Q, string A)> items)
+        internal static string Faq(IEnumerable<(string Q, string A)> items)
         {
             var b = new StringBuilder("<h2>Frequently asked questions</h2>");
             foreach (var (q, a) in items) b.Append($"<details><summary>{H(q)}</summary><p>{H(a)}</p></details>");
@@ -451,7 +461,7 @@ namespace Bhasini.SiteGen
         private static IEnumerable<IndicLanguage> Variants(IndicLanguage l) =>
             LanguageCatalog.All.Where(v => v.Code.StartsWith(l.Code + "-", StringComparison.Ordinal));
 
-        private static (string Keys, string Meaning)[] Examples(this IndicLanguage l) =>
+        internal static (string Keys, string Meaning)[] Examples(this IndicLanguage l) =>
             ExampleWords.TryGetValue(l.Code, out var list) ? list : new[] { (l.SampleInput, l.Name) };
 
         private static string Inscript(IndicLanguage l, char key)
@@ -462,16 +472,16 @@ namespace Bhasini.SiteGen
 
         private static string FirstWord(string s) => s.Split(' ')[0];
 
-        private static string Native(IndicLanguage l, string text) =>
+        internal static string Native(IndicLanguage l, string text) =>
             $"<span class=\"native {l.FontClass}\" dir=\"auto\" lang=\"{l.Code}\">{H(text)}</span>";
 
-        private static string H(string s) => s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+        internal static string H(string s) => s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
 
         private static string Attr(string s) => H(s);
 
         // ---- Structured data ----
 
-        private static readonly JsonSerializerOptions Json = new()
+        internal static readonly JsonSerializerOptions Json = new()
         {
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
         };
@@ -510,7 +520,7 @@ namespace Bhasini.SiteGen
             }).ToArray(),
         }, Json);
 
-        private static object FaqLd(IEnumerable<(string Q, string A)> items) => new Dictionary<string, object>
+        internal static object FaqLd(IEnumerable<(string Q, string A)> items) => new Dictionary<string, object>
         {
             ["@type"] = "FAQPage",
             ["mainEntity"] = items.Select(i => new Dictionary<string, object>
@@ -540,6 +550,8 @@ namespace Bhasini.SiteGen
                     _ => "0.7",
                 });
             }
+            Url("/api/", "weekly", "0.8");
+            foreach (var p in ApiPages.All) Url(p.Path, "monthly", "0.7");
             Url("/mcp/", "monthly", "0.6");
             Url("/privacy.html", "yearly", "0.3");
             Url("/terms.html", "yearly", "0.3");

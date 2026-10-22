@@ -18,11 +18,13 @@ Meetei Mayek, Perso-Arabic Kashmiri or Sindhi, Gurmukhi tippi/addak, Malayalam c
 - **How to type a letter, or unsure of the romanisation**: `get_keymap`, then build the input from it.
   Capitals mark long vowels and retroflex consonants (`A I U E O`, `T D N L Sh`); `M` is anusvara.
 - **Digits** in native numerals: `native_digits`.
+- **Meaning in another language** ("translate this into Tamil", "what does this Odia say?"): `translate`.
+  English ↔ any of the 22 languages, or between two of them. It sends the text to Bhasini's server.
 - **Language codes**: `list_languages` (for example `hi`, `ta`, `kn`, `sat`, `mni`, `ks`, `sd`).
 
 ## Good habits
 
 - Show the romanised input next to the result the first time, so the user can correct the spelling.
-- For a translation request, translate into the language first, then use `transliterate` only if you
-  wrote the translation in Latin letters.
+- For a translation request, prefer `translate`, especially for low-resource languages (Santali, Bodo,
+  Dogri, Manipuri, Kashmiri). Use `transliterate` only for words you already have in Latin letters.
 - If a result looks wrong, check the keys with `get_keymap` and try again rather than editing letters by hand.

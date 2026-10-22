@@ -16,3 +16,9 @@ artifacts/
 workers/bhasini-mcp/test/fixtures.json
 workers/bhasini-mcp/node_modules/
 workers/bhasini-mcp/.wrangler/
+
+# Local overrides for the Blazor app (e.g. a local translation Worker)
+src/Bhasini.Web/wwwroot/appsettings.Development.json
+
+# Local Worker secrets (Razorpay test keys for wrangler dev)
+workers/bhasini-mcp/.dev.vars

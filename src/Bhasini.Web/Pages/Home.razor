@@ -3,6 +3,7 @@
 @inject TypingSession Session
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject TranslationClient Translator
 @implements IDisposable
 
 <PageTitle>@(landing?.Title ?? "Bhasini — Type in all 22 Indian languages")</PageTitle>
@@ -49,6 +50,9 @@
         </button>
         <button class="btn btn-outline-secondary" @onclick="OpenConvert" title="Convert text between Indian scripts">
             <span class="bi bi-arrow-left-right"></span><span class="btn-label"> Convert</span>
+        </button>
+        <button class="btn btn-outline-secondary" @onclick="OpenTranslate" title="Translate between English and Indian languages">
+            <span class="bi bi-translate"></span><span class="btn-label"> Translate</span>
         </button>
         @if (speechSupported && Language.SpeechLocale != null)
         {
@@ -266,6 +270,63 @@
     </div>
 }
 
+@if (showTranslate)
+{
+    <div class="modal-backdrop show"></div>
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span class="bi bi-translate me-2"></span>Translate</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModals" disabled="@translating"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label small text-muted" for="translateSource">From</label>
+                    <select class="form-select mb-3" id="translateSource" @bind="translateSource" disabled="@translating">
+                        <option value="auto">Detect language</option>
+                        @foreach (var lang in LanguageCatalog.All)
+                        {
+                            <option value="@TranslateCode(lang)">@LanguageOption(lang)</option>
+                        }
+                    </select>
+
+                    <label class="form-label small text-muted" for="translateTarget">Into</label>
+                    <select class="form-select mb-3" id="translateTarget" @bind="translateTarget" disabled="@translating">
+                        @foreach (var lang in LanguageCatalog.All)
+                        {
+                            <option value="@TranslateCode(lang)">@LanguageOption(lang)</option>
+                        }
+                    </select>
+
+                    <div class="small text-muted">
+                        @(translateHasSelection ? "The selected text will be replaced by its translation." : "Nothing is selected, so the whole document will be translated.")
+                        Undo brings the original back.
+                        <br /><span class="bi bi-cloud me-1"></span>Translation sends the text to Bhasini's server (AI4Bharat IndicTrans2 on Cloudflare). It is not stored.
+                        Free: up to @TranslationClient.MaxCharacters.ToString("N0") characters at a time and @TranslationClient.FreeCharactersPerDay.ToString("N0") a day.
+                    </div>
+                    @if (translateError != null)
+                    {
+                        <div class="alert alert-warning small mt-3 mb-0" role="alert">@translateError</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModals" disabled="@translating">Cancel</button>
+                    <button class="btn btn-primary" @onclick="RunTranslate" disabled="@translating">
+                        @if (translating)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span><span>Translating…</span>
+                        }
+                        else
+                        {
+                            <span>Translate</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     // Landing pages (/hindi-typing/, /tamil-keyboard/, …) open the editor in their language.
     [Parameter] public string? Slug { get; set; }
@@ -279,6 +340,12 @@
     bool showLanguagePicker;
     bool showSave;
     bool showConvert;
+    bool showTranslate;
+    bool translating;
+    string translateSource = "auto";
+    string translateTarget = "en";
+    bool translateHasSelection;
+    string? translateError;
     bool speechSupported;
     bool listening;
     string languageFilter = "";
@@ -561,6 +628,7 @@
         showLanguagePicker = false;
         showSave = false;
         showConvert = false;
+        if (!translating) showTranslate = false;
     }
 
     private async Task DownloadDocx()
@@ -648,6 +716,72 @@
 
         CloseModals();
         ShowStatus($"Converted to {target.Name}");
+    }
+
+    // ---- Translation ----
+
+    // The API takes "en" for English; every other language uses its catalog code.
+    private static string TranslateCode(IndicLanguage lang) => lang.IsEnglish ? "en" : lang.Code;
+
+    private static string LanguageOption(IndicLanguage lang) =>
+        lang.IsEnglish ? "English" : $"{lang.Name} — {lang.NativeName}";
+
+    private async Task OpenTranslate()
+    {
+        var selected = await JS.InvokeAsync<string>("bhasini.editor.getSelectedText");
+        translateHasSelection = !string.IsNullOrEmpty(selected);
+        translateError = null;
+        // Typing in an Indian language usually means translating it into English, and vice versa.
+        translateSource = "auto";
+        translateTarget = Language.IsEnglish ? (translateTarget == "en" ? "hi" : translateTarget) : "en";
+        showTranslate = true;
+    }
+
+    private async Task RunTranslate()
+    {
+        var selected = await JS.InvokeAsync<string>("bhasini.editor.getSelectedText");
+        bool whole = string.IsNullOrEmpty(selected);
+        var source = (whole ? await JS.InvokeAsync<string>("bhasini.editor.getText") : selected).TrimEnd('\n');
+
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            translateError = "There is no text to translate.";
+            return;
+        }
+        if (source.EnumerateRunes().Count() > TranslationClient.MaxCharacters)
+        {
+            translateError = $"The text is longer than {TranslationClient.MaxCharacters:N0} characters. Select a part of it and translate that.";
+            return;
+        }
+
+        translating = true;
+        translateError = null;
+        // The handler already yielded on the JS calls above, so show the spinner explicitly.
+        StateHasChanged();
+        try
+        {
+            var result = await Translator.TranslateAsync(source, translateSource, translateTarget);
+            Session.Reset();
+            if (whole) await JS.InvokeVoidAsync("bhasini.editor.setText", result.Translation);
+            else await JS.InvokeVoidAsync("bhasini.editor.replaceSelection", result.Translation);
+
+            translating = false;
+            showTranslate = false;
+            // Keep typing in the language just translated into (also sets right-to-left for Urdu, Kashmiri, Sindhi).
+            var target = translateTarget == "en" ? LanguageCatalog.English : LanguageCatalog.Get(translateTarget);
+            if (target != Language) await ChooseLanguage(target);
+            ShowStatus(result.FreeCharsLeftToday is int left
+                ? $"Translated into {target.Name} · {left:N0} free characters left today"
+                : $"Translated into {target.Name}");
+        }
+        catch (TranslationException ex)
+        {
+            translateError = ex.Message;
+        }
+        finally
+        {
+            translating = false;
+        }
     }
 
     // ---- Speech ----

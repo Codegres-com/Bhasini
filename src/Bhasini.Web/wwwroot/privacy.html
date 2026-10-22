@@ -39,6 +39,7 @@
       <li><a href="#local">Local MCP server</a></li>
       <li><a href="#website">Website</a></li>
       <li><a href="#windows">Windows app</a></li>
+      <li><a href="#api">Translation API accounts</a></li>
       <li><a href="#recipients">Who receives data</a></li>
       <li><a href="#retention">Retention</a></li>
       <li><a href="#controls">Your choices and rights</a></li>
@@ -50,8 +51,9 @@
 
   <h2 id="summary">Summary</h2>
   <ul>
-    <li>Bhasini has no accounts, sign-in, analytics, advertising or tracking cookies.</li>
+    <li>Bhasini has no analytics, advertising or tracking cookies, and needs no account. The only accounts are for the paid <a href="#api">Translation API</a>, which keeps your email address, credit balance, usage counts and payment records.</li>
     <li>Text sent to Bhasini's tools is converted in memory and discarded when the request ends. We do not store it, log it, read it, sell it, share it or use it to train any model.</li>
+    <li>Typing, script conversion and the other tools run on your device or in memory on our server. <strong>Translation</strong> is the one feature where your text is processed by an AI model: it goes through mcp.bhasini.com to Cloudflare Workers AI, and is not stored by us.</li>
     <li>The hosted server sees your IP address and basic request details. These are used only to rate-limit and to keep the service running, and are deleted within 7 days.</li>
     <li>We do not sell personal data or use it for advertising or profiling.</li>
   </ul>
@@ -71,13 +73,18 @@
     <tr><td><code>native_digits</code></td><td>Text containing digits and a language code</td><td>The text with digits in that language's numerals</td></tr>
     <tr><td><code>get_keymap</code></td><td>A language code</td><td>The phonetic keyboard map for that language</td></tr>
     <tr><td><code>list_languages</code></td><td>Nothing</td><td>The list of supported languages, scripts and codes</td></tr>
+    <tr><td><code>translate</code></td><td>Text, a target language code and optionally a source language code</td><td>The text translated into the target language</td></tr>
   </table>
   </div>
   <p>Tool input text is whatever the assistant sends, so it could contain personal information if you ask
   for, say, your name or address to be written in another script. However, it is handled the same way as
   any other text: it is converted in memory, the result is returned in the response, and both are discarded. Neither the
-  input nor the output is written to disk, a database or a log. All tools are read-only. They do not
-  contact any other service and keep no state between calls.</p>
+  input nor the output is written to disk, a database or a log. All tools are read-only and keep no state
+  between calls. Every tool except <code>translate</code> runs entirely inside our server and contacts no
+  other service.</p>
+  <p><code>translate</code> sends the text to Cloudflare Workers AI, which runs the translation models
+  (AI4Bharat IndicTrans2 and Google Gemma) and returns the result. We do not store the text or the
+  translation. Under Cloudflare's terms, Workers AI does not use this text to train models.</p>
   <p>An assistant may add metadata to a tool call, such as your locale or approximate location. Bhasini
   ignores this metadata and does not store it.</p>
 
@@ -86,19 +93,22 @@
   (in ChatGPT this is usually an OpenAI server address rather than your own), the time, the URL path, the
   HTTP method, the response status and size, and standard headers such as the user agent. This connection data is used only to:</p>
   <ul>
-    <li><strong>Rate-limit requests:</strong> the IP address is used as a counter key to allow 120 requests a minute per client. The counter expires after 60 seconds.</li>
+    <li><strong>Rate-limit requests:</strong> the IP address is used as a counter key to allow 120 requests a minute per client (5 a minute for translation). The counters expire after 60 seconds.</li>
+    <li><strong>Daily translation allowance:</strong> to give each user 10,000 free characters of translation a day, we keep a count of characters translated per client for the current day (India time). The counter is keyed by a one-way hash of the IP address, not the address itself, holds only a number, and is deleted shortly after midnight IST.</li>
     <li><strong>Operate and secure the service:</strong> Cloudflare Workers operational logs record request metadata (time, path, method, status, duration, errors and the request headers listed above). We use them only to find faults and abuse. They never contain tool input or output text.</li>
   </ul>
 
   <h2 id="local">Local MCP server (Bhasini.Mcp)</h2>
   <p>The local server runs on your own computer. Text that your AI assistant sends to it is processed in
-  memory and discarded when the call returns. It collects nothing, stores nothing and makes no network
-  requests, so we receive no data from it at all.</p>
+  memory and discarded when the call returns. It collects nothing and stores nothing. Its only network
+  request is the <code>translate</code> tool, which sends the text to mcp.bhasini.com and is handled as described
+  above. The other tools make no network requests, so we receive no data from them.</p>
 
   <h2 id="website">Website (bhasini.com)</h2>
   <p>The editor runs entirely in your browser. Text you type, convert or open is processed on your device and
   is not sent to us. Documents are saved only where you choose to save them.</p>
   <ul>
+    <li><strong>Translation:</strong> if you press Translate, the selected text (or the whole document) is sent to mcp.bhasini.com and translated by Cloudflare Workers AI, as described for the <code>translate</code> tool above. It is not stored. Nothing is sent unless you press Translate.</li>
     <li><strong>Preferences:</strong> your language, keyboard and display options are saved in your browser's local storage so Bhasini remembers them. They stay on your device.</li>
     <li><strong>Hosting:</strong> the site is served by GitHub Pages, which receives standard web request data (such as your IP address and user agent) and may log it for security under GitHub's privacy statement.</li>
     <li><strong>Fonts:</strong> the site may load Noto fonts from Google Fonts, which receives standard web request data (such as your IP address).</li>
@@ -107,11 +117,25 @@
   </ul>
 
   <h2 id="windows">Windows app</h2>
-  <p>The app works offline and sends nothing to us. Your preferences are saved locally on your computer.</p>
+  <p>The app works offline and sends nothing to us, except text you choose to translate with the Translate
+  button, which is handled as on the website. Your preferences are saved locally on your computer.</p>
   <p>When you turn on Global mode (F9), Bhasini reads your keystrokes system-wide only to convert them into the
   Indian language you chose and type the result into the active window. Keystrokes are handled in memory,
   are not stored or logged, and are not transmitted. Global mode stays off until you turn it on, and you can
   turn it off at any time with F9 or from the tray icon.</p>
+
+  <h2 id="api">Translation API accounts (bhasini.com/api)</h2>
+  <p>If you sign up for the Translation API, we store, in a Cloudflare D1 database:</p>
+  <ul>
+    <li><strong>Your email address and the name you entered</strong>, to identify your account and contact you about it.</li>
+    <li><strong>A one-way hash of your API key</strong>, not the key itself. We cannot show your key again, only replace it.</li>
+    <li><strong>Your credit balance and daily usage</strong>: the number of characters and requests per day. Never the text you translate.</li>
+    <li><strong>Payment records</strong> from Razorpay: order and payment ids, pack, amount and date.</li>
+    <li><strong>A one-way hash of the IP address you signed up from</strong>, to limit how many accounts one network can create each day.</li>
+  </ul>
+  <p>The dashboard keeps your API key in your browser's local storage so you stay signed in; signing out removes it.
+  Text you translate with your key is handled like all translation: processed in memory and not stored.
+  To close your account and delete its data, write to us from your account's email address.</p>
 
   <h2 id="recipients">Who receives data</h2>
   <p>We do not sell, rent or share personal data with anyone for their own purposes. These service providers
@@ -119,11 +143,11 @@
   <div class="table-wrap">
   <table>
     <tr><th>Recipient</th><th>Data</th><th>Purpose</th></tr>
-    <tr><td>Cloudflare, Inc.</td><td>Connection data for mcp.bhasini.com (IP address, request metadata). Tool text passes through its servers in memory only.</td><td>Hosting the MCP server, rate limiting, operational logs, security</td></tr>
+    <tr><td>Cloudflare, Inc.</td><td>Connection data for mcp.bhasini.com (IP address, request metadata). Tool text passes through its servers in memory only. Text you translate is processed by Workers AI.</td><td>Hosting the MCP server and translation API, running the translation models, rate limiting, operational logs, security</td></tr>
     <tr><td>GitHub, Inc.</td><td>Web request data for bhasini.com</td><td>Hosting the website</td></tr>
     <tr><td>Google LLC</td><td>Web request data when fonts load</td><td>Serving fonts</td></tr>
     <tr><td>Your browser's speech provider</td><td>Audio, only when you use voice typing</td><td>Speech recognition</td></tr>
-    <tr><td>Razorpay Software Pvt. Ltd.</td><td>Payment details, only when you sponsor</td><td>Processing payments</td></tr>
+    <tr><td>Razorpay Software Pvt. Ltd.</td><td>Payment details, only when you sponsor or buy API credits</td><td>Processing payments</td></tr>
   </table>
   </div>
   <p>Your AI assistant (for example ChatGPT by OpenAI, or Claude by Anthropic) handles your conversation under
@@ -134,11 +158,13 @@
   <div class="table-wrap">
   <table>
     <tr><th>Data</th><th>How long it is kept</th></tr>
-    <tr><td>Tool input and output text (hosted and local servers)</td><td>Not kept. Discarded when the request ends.</td></tr>
+    <tr><td>Tool input and output text, including text you translate (hosted and local servers, website, app)</td><td>Not kept. Discarded when the request ends.</td></tr>
     <tr><td>IP address in the rate-limit counter</td><td>60 seconds</td></tr>
+    <tr><td>Daily translation character count (keyed by a hash of the IP address)</td><td>Until shortly after midnight IST the same day</td></tr>
     <tr><td>Cloudflare Workers operational logs</td><td>Deleted automatically within 7 days</td></tr>
     <tr><td>Website and app preferences</td><td>On your device until you clear them</td></tr>
-    <tr><td>Sponsorship payment records</td><td>As long as Indian accounting and tax law requires (currently up to 8 years)</td></tr>
+    <tr><td>Sponsorship and API payment records</td><td>As long as Indian accounting and tax law requires (currently up to 8 years)</td></tr>
+    <tr><td>Translation API account (email, name, key hash, balance, daily usage)</td><td>Until you ask us to close the account, then deleted within 30 days (payment records are kept as above)</td></tr>
   </table>
   </div>
   <p>Cloudflare, GitHub, Google, your speech provider and Razorpay may keep their own records for longer under their own policies.</p>
@@ -161,7 +187,7 @@
 
   <h2 id="children">Children</h2>
   <p>Bhasini is not directed at children under 13 and does not knowingly collect personal information from
-  them. Bhasini has no accounts, so it holds no profile of any user, whatever their age.</p>
+  them. Apart from Translation API accounts, which are meant for developers and businesses, Bhasini has no accounts, so it holds no profile of other users, whatever their age.</p>
 
   <h2 id="changes">Changes and contact</h2>
   <p>If this policy changes, we will update this page and the date at the top. If a change affects how tool

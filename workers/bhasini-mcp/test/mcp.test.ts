@@ -38,9 +38,9 @@ test("notifications get 202 with no body", async () => {
   assert.equal(await res.text(), "");
 });
 
-test("tools/list returns the five tools", async () => {
+test("tools/list returns the six tools", async () => {
   const r = await rpc("tools/list");
-  assert.deepEqual(r.result.tools.map((t: any) => t.name).sort(), ["convert_script", "get_keymap", "list_languages", "native_digits", "transliterate"]);
+  assert.deepEqual(r.result.tools.map((t: any) => t.name).sort(), ["convert_script", "get_keymap", "list_languages", "native_digits", "translate", "transliterate"]);
 });
 
 test("tools/call runs a tool", async () => {

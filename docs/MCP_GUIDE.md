@@ -6,7 +6,7 @@ Status: **local server, package, plugin, docs page and remote (Cloudflare Worker
 
 | Piece | Path | What it is |
 |---|---|---|
-| MCP server | `src/Bhasini.Mcp/` | C# stdio server on the [MCP C# SDK](https://www.nuget.org/packages/ModelContextProtocol) 2.2.0, reusing `Bhasini.Core`. Five read-only tools: `list_languages`, `transliterate`, `convert_script`, `get_keymap`, `native_digits` |
+| MCP server | `src/Bhasini.Mcp/` | C# stdio server on the [MCP C# SDK](https://www.nuget.org/packages/ModelContextProtocol) 2.2.0, reusing `Bhasini.Core`. Six read-only tools: `list_languages`, `transliterate`, `convert_script`, `get_keymap`, `native_digits`, and `translate` (the only one that goes online: it calls the Worker's `/v1/translate`, see [TRANSLATION_API_PLAN.md](TRANSLATION_API_PLAN.md)) |
 | NuGet / .NET tool package | `dotnet pack src/Bhasini.Mcp` | `Bhasini.Mcp` 0.1.0, package type `McpServer`, command `bhasini-mcp`, includes `README.md` (with the `mcp-name` marker and Privacy Policy) and `.mcp/server.json` |
 | Registry manifest | `src/Bhasini.Mcp/.mcp/server.json` | Official MCP Registry entry `io.github.Codegres-com/bhasini` |
 | Claude plugin | `plugins/bhasini/` | Plugin manifest + icon + `.mcp.json` (the hosted server, `https://mcp.bhasini.com/mcp`) + `indic-text` skill + README + LICENSE. Works on claude.ai, Cowork and Claude Code with nothing to install. Passes `claude plugin validate` and the portal's validation |
